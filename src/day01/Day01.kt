@@ -22,34 +22,16 @@ private fun processLine(line: String) = line.toCharArray()
     .filter(Char::isDigit)
     .map(Char::digitToInt)
 
-private val mapping = mapOf(
-    "one" to "1ne",
-    "two" to "2wo",
-    "three" to "3hree",
-    "four" to "4our",
-    "five" to "5ive",
-    "six" to "6ix",
-    "seven" to "7even",
-    "eight" to "8ight",
-    "nine" to "9ine"
-)
-
-private fun preProcessLine(line: String): String {
-    var current = line
-    while (true) {
-        current.indices.forEach c@{ index ->
-            mapping.forEach { pair ->
-                if (current.startsWith(pair.key, index)) {
-                    current = current.replaceFirst(pair.key, pair.value)
-                    return@c
-                }
-            }
-        }
-        break
-    }
-
-    return current
-}
+private fun preProcessLine(line: String): String = line
+    .replace("one", "o1e")
+    .replace("two", "t2o")
+    .replace("three", "t3ree")
+    .replace("four", "f4ur")
+    .replace("five", "f5ve")
+    .replace("six", "s6x")
+    .replace("seven", "s7ven")
+    .replace("eight", "e8ght")
+    .replace("nine", "n9ne")
 
 private fun part1(input: List<String>): Int = input.convertAndSum { it }
 
