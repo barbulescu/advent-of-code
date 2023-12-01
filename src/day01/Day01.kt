@@ -1,7 +1,7 @@
 package day01
 
-import readInput
 import expectResult
+import readInput
 
 fun main() {
     // test if implementation meets criteria from the description, like:
@@ -51,21 +51,14 @@ private fun preProcessLine(line: String): String {
     return current
 }
 
-private fun part1(input: List<String>): Int {
-    return input
-        .asSequence()
-        .map { processLine(it) }
-        .map { "${it.first()}${it.last()}" }
-        .map(String::toInt)
-        .sum()
-}
+private fun part1(input: List<String>): Int = input.convertAndSum { it }
 
-private fun part2(input: List<String>): Int {
-    return input
-        .asSequence()
-        .map { preProcessLine(it) }
-        .map { processLine(it) }
-        .map { "${it.first()}${it.last()}" }
-        .map(String::toInt)
-        .sum()
-}
+private fun part2(input: List<String>): Int = input.convertAndSum { preProcessLine(it) }
+
+private fun List<String>.convertAndSum(preProcessor: (String) -> String): Int = this
+    .asSequence()
+    .map(preProcessor)
+    .map { processLine(it) }
+    .map { "${it.first()}${it.last()}" }
+    .map(String::toInt)
+    .sum()
