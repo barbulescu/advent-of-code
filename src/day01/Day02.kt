@@ -8,13 +8,13 @@ fun main() {
     expectResult(8) {
         part1(readInput("Day02_1_test"))
     }
-//    expectResult(281) {
-//        part2(readInput("Day02_2_test"))
-//    }
+    expectResult(2286) {
+        part2(readInput("Day02_2_test"))
+    }
 
     val data = readInput("Day02")
     println("#1 -> ${part1(data)}")
-//    println("#2 -> ${part2(data)}")
+    println("#2 -> ${part2(data)}")
 }
 
 const val MAX_RED = 12
@@ -33,7 +33,10 @@ private fun part1(input: List<String>): Int {
 }
 
 private fun part2(input: List<String>): Int {
-    return 2
+    return input.asSequence()
+        .map(String::parseLine)
+        .map(Game::power)
+        .sum()
 }
 
 private fun String.parseLine(): Game {
@@ -61,6 +64,13 @@ fun String.parseGameSet(): GameSet {
 
 data class Game(val id: Int, val sets: Set<GameSet>) {
     fun isValid() = sets.all { it.isValid() }
+
+    fun power(): Int {
+        val red = sets.maxOfOrNull { it.red } ?: 0
+        val green = sets.maxOfOrNull { it.green } ?: 0
+        val blue = sets.maxOfOrNull { it.blue } ?: 0
+        return red * green * blue
+    }
 }
 
 data class GameSet(val red: Int, val green: Int, val blue: Int) {
