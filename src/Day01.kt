@@ -1,8 +1,3 @@
-package day01
-
-import expectResult
-import readInput
-
 fun main() {
     // test if implementation meets criteria from the description, like:
     expectResult(142) {
