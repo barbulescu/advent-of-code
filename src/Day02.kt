@@ -12,12 +12,12 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-const val MAX_RED = 12
-const val MAX_GREEN = 13
-const val MAX_BLUE = 14
+private const val MAX_RED = 12
+private const val MAX_GREEN = 13
+private const val MAX_BLUE = 14
 
-val mainGroupsRegex = Regex("[:;]")
-val setRegex = Regex("\\s*(\\d+)\\s+(\\w+)")
+private val mainGroupsRegex = Regex("[:;]")
+private val setRegex = Regex("\\s*(\\d+)\\s+(\\w+)")
 
 private fun part1(input: List<String>): Int {
     return input.asSequence()
