@@ -1,5 +1,4 @@
-import utils.expectResult
-import utils.readInput
+import utils.*
 
 private const val DAY = "Day03"
 
@@ -17,111 +16,67 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Int {
-    val data = input
-        .map(String::toCharArray)
-        .map(CharArray::toList)
-    val engine = Engine(data)
-    return engine.partSum()
-}
+private fun part1(input: List<String>): Int = input
+    .toGrid()
+    .asNumbers()
+    .filter(Number::hasAdjacentSymbol)
+    .sumOf(Number::toInt)
 
-private fun part2(input: List<String>): Int {
-    val data = input
-        .map(String::toCharArray)
-        .map(CharArray::toList)
-    val engine = Engine(data)
-    return engine.gearRatioSum()
-}
+private fun part2(input: List<String>): Int = input
+    .toGrid()
+    .asNumbers()
+    .flatMap(Number::findGears)
+    .groupBy({ it.first }, { it.second })
+    .values
+    .filter { it.size == 2 }
+    .sumOf { it[0] * it[1] }
 
-private class Engine(private val data: List<List<Char>>) {
-
-    fun partSum(): Int = data.toNumbers()
-        .filter { points -> points.any { point -> data.isValid(point) } }
-        .sumOf { points -> points.toInt() }
-
-    fun gearRatioSum(): Int = data.toNumbers()
-        .asSequence()
-        .flatMap { points ->
-            points.mapNotNull { data.gear(it) }
-                .distinct()
-                .map { it to points.toInt() }
-        }
-        .groupBy({ it.first }, { it.second })
-        .values
-        .filter { it.size == 2 }
-        .sumOf { it[0] * it[1] }
-}
-
-private fun List<List<Char>>.isValid(point: Point): Boolean =
-    this.neighbours(point.x, point.y)
-        .filterNotNull()
-        .filterNot { it.char == '.' }
-        .filterNot { it.char.isDigit() }
-        .any()
-
-private fun List<List<Char>>.gear(point: Point): Gear? =
-    this.neighbours(point.x, point.y)
-        .filterNotNull()
-        .filter { it.char == '*' }
-        .map { Gear(it.x, it.y) }
-        .singleOrNull()
-
-private fun List<List<Char>>.neighbours(x: Int, y: Int) = sequenceOf(
-    valueAt(x - 1, y - 1),
-    valueAt(x, y - 1),
-    valueAt(x - 1, y),
-    valueAt(x - 1, y + 1),
-    valueAt(x + 1, y - 1),
-    valueAt(x + 1, y + 1),
-    valueAt(x, y + 1),
-    valueAt(x + 1, y),
-)
-
-private fun List<List<Char>>.valueAt(x: Int, y: Int): Point? {
-    if (x < 0 || x >= this.size) {
-        return null
-    }
-    if (y < 0 || y >= this[0].size) {
-        return null
-    }
-    return Point(x, y, this[x][y])
-}
-
-private fun List<List<Char>>.toNumbers() = this
-    .asSequence()
-    .flatMapIndexed { x, chars -> chars.toPoints(x) }
+private fun Grid.asNumbers() = this
+    .asPoints()
     .windowed(2)
-    .filter { it[0].digit }
-    .fold(mutableListOf(mutableListOf<Point>())) { numbers, window -> splitNumbers(window, numbers) }
-    .filterNot { it.isEmpty() }
-
-private fun splitNumbers(
-    window: List<Point>,
-    numbers: MutableList<MutableList<Point>>
-): MutableList<MutableList<Point>> {
-    val p1: Point = window[0]
-    val p2: Point? = window.getOrNull(1)
-    numbers.last().add(p1)
-    if (p2 == null || !p2.digit || p2.reset) {
-        numbers.add(mutableListOf())
+    .filter { it[0].isDigit() }
+    .fold(mutableListOf(Number(this))) { numbers, window ->
+        val p1: Point = window[0]
+        val p2: Point? = window.getOrNull(1)
+        numbers.last().addPoint(p1)
+        if (p2 == null || !p2.isDigit() || p2.isFirstColumn()) {
+            numbers.add(Number(this))
+        }
+        numbers
     }
-    return numbers
-}
+    .filter(Number::isNotEmpty)
 
-private fun List<Char>.toPoints(x: Int) = this.mapIndexed { y, value -> Point(x, y, value) }
-
-private fun MutableList<Point>.toInt() = this
-    .map { point -> point.char }
-    .joinToString(separator = "")
-    .toInt()
 
 private data class Gear(val x: Int, val y: Int)
-private data class Point(
-    val x: Int,
-    val y: Int,
-    val char: Char,
-    val digit: Boolean = char.isDigit(),
-    val symbol: Boolean = !(char.isDigit() || char == '.'),
-    val gear: Boolean = char == '*',
-    val reset: Boolean = y == 0
-)
+
+private data class Number(private val grid: Grid, private val data: MutableList<Point> = mutableListOf()) {
+    fun addPoint(point: Point) {
+        data.add(point)
+    }
+
+    fun isNotEmpty() = data.isNotEmpty()
+
+    fun toInt() = data
+        .map(Point::char)
+        .joinToString(separator = "")
+        .toInt()
+
+    fun hasAdjacentSymbol() = data.any { it.hasAdjacentSymbol() }
+
+    private fun Point.hasAdjacentSymbol(): Boolean =
+        grid.neighbours(x, y)
+            .filterNot { it.char == '.' }
+            .filterNot { it.char.isDigit() }
+            .any()
+
+    fun findGears(): List<Pair<Gear, Int>> =
+        data.flatMap { it.findGears() }
+            .distinct()
+            .map { it to toInt() }
+
+    private fun Point.findGears(): Sequence<Gear> =
+        grid.neighbours(x, y)
+            .filter { it.char == '*' }
+            .map { Gear(it.x, it.y) }
+
+}
