@@ -1,3 +1,6 @@
+import utils.expectResult
+import utils.readInput
+
 fun main() {
     // test if implementation meets criteria from the description, like:
     expectResult(142) {

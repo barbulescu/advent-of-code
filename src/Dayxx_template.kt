@@ -1,3 +1,6 @@
+import utils.expectResult
+import utils.readInput
+
 private const val DAY = "Dayxx"
 
 fun main() {

@@ -1,3 +1,6 @@
+import utils.expectResult
+import utils.readInput
+
 private const val DAY = "Day03"
 
 fun main() {
@@ -31,67 +34,22 @@ private fun part2(input: List<String>): Int {
 }
 
 private class Engine(private val data: List<List<Char>>) {
-    private val points: List<Point> = data.flatMapIndexed { x, chars ->
-        chars.mapIndexed { y, value -> Point(x, y, value) }
-    }
 
-    fun partSum(): Int {
-        return points.asSequence()
-            .windowed(2)
-            .filter { it[0].digit }
-            .fold(mutableListOf(mutableListOf<Point>())) { numbers, window ->
-                val p1: Point = window[0]
-                val p2: Point? = window.getOrNull(1)
-                numbers.last().add(p1)
-                if (p2 == null || !p2.digit || p2.reset) {
-                    numbers.add(mutableListOf())
-                }
-                numbers
-            }
-            .filterNot { it.isEmpty() }
-            .filter { points -> points.any { point -> data.isValid(point) } }
-            .sumOf { points -> points.toInt() }
-    }
+    fun partSum(): Int = data.toNumbers()
+        .filter { points -> points.any { point -> data.isValid(point) } }
+        .sumOf { points -> points.toInt() }
 
-    fun gearRatioSum(): Int {
-        val gearParts = mutableMapOf<Gear, MutableList<Int>>()
-        for (x in data.indices) {
-            var currentNumber = ""
-            val gears = mutableSetOf<Gear>()
-            for (y in data[0].indices) {
-                if (data[x][y].isDigit()) {
-                    currentNumber += data[x][y]
-                    gears.addAll(data.gears(x, y))
-                } else {
-                    addGearParts(gears, gearParts, currentNumber)
-                    currentNumber = ""
-                    gears.clear()
-                }
-            }
-            addGearParts(gears, gearParts, currentNumber)
+    fun gearRatioSum(): Int = data.toNumbers()
+        .asSequence()
+        .flatMap { points ->
+            points.mapNotNull { data.gear(it) }
+                .distinct()
+                .map { it to points.toInt() }
         }
-        return gearParts
-            .filterValues { it.size == 2 }
-            .values
-            .sumOf { it[0] * it[1] }
-
-
-    }
-
-    private fun addGearParts(
-        gears: MutableSet<Gear>,
-        gearParts: MutableMap<Gear, MutableList<Int>>,
-        currentNumber: String
-    ) {
-        if (gears.isNotEmpty()) {
-            gears.forEach {
-                gearParts.putIfAbsent(it, mutableListOf())
-                gearParts[it]?.add(currentNumber.toInt())
-            }
-        }
-    }
-
-
+        .groupBy({ it.first }, { it.second })
+        .values
+        .filter { it.size == 2 }
+        .sumOf { it[0] * it[1] }
 }
 
 private fun List<List<Char>>.isValid(point: Point): Boolean =
@@ -101,12 +59,12 @@ private fun List<List<Char>>.isValid(point: Point): Boolean =
         .filterNot { it.char.isDigit() }
         .any()
 
-private fun List<List<Char>>.gears(x: Int, y: Int): List<Gear> =
-    this.neighbours(x, y)
+private fun List<List<Char>>.gear(point: Point): Gear? =
+    this.neighbours(point.x, point.y)
         .filterNotNull()
         .filter { it.char == '*' }
         .map { Gear(it.x, it.y) }
-        .toList()
+        .singleOrNull()
 
 private fun List<List<Char>>.neighbours(x: Int, y: Int) = sequenceOf(
     valueAt(x - 1, y - 1),
@@ -128,6 +86,29 @@ private fun List<List<Char>>.valueAt(x: Int, y: Int): Point? {
     }
     return Point(x, y, this[x][y])
 }
+
+private fun List<List<Char>>.toNumbers() = this
+    .asSequence()
+    .flatMapIndexed { x, chars -> chars.toPoints(x) }
+    .windowed(2)
+    .filter { it[0].digit }
+    .fold(mutableListOf(mutableListOf<Point>())) { numbers, window -> splitNumbers(window, numbers) }
+    .filterNot { it.isEmpty() }
+
+private fun splitNumbers(
+    window: List<Point>,
+    numbers: MutableList<MutableList<Point>>
+): MutableList<MutableList<Point>> {
+    val p1: Point = window[0]
+    val p2: Point? = window.getOrNull(1)
+    numbers.last().add(p1)
+    if (p2 == null || !p2.digit || p2.reset) {
+        numbers.add(mutableListOf())
+    }
+    return numbers
+}
+
+private fun List<Char>.toPoints(x: Int) = this.mapIndexed { y, value -> Point(x, y, value) }
 
 private fun MutableList<Point>.toInt() = this
     .map { point -> point.char }
