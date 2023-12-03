@@ -12,7 +12,6 @@ fun main() {
     val data = readInput(DAY)
     println("#1 -> ${part1(data)}")
     println("#2 -> ${part2(data)}")
-
 }
 
 private fun part1(input: List<String>): Int {
@@ -32,32 +31,26 @@ private fun part2(input: List<String>): Int {
 }
 
 private class Engine(private val data: List<List<Char>>) {
-    private val maxX = data.size
-    private val maxY = data[0].size
+    private val points: List<Point> = data.flatMapIndexed { x, chars ->
+        chars.mapIndexed { y, value -> Point(x, y, value) }
+    }
 
     fun partSum(): Int {
-        var sum = 0
-        for (x in data.indices) {
-            var currentNumber = ""
-            var valid = false
-            for (y in data[0].indices) {
-                if (data[x][y].isDigit()) {
-                    currentNumber += data[x][y]
-                    valid = valid || isValid(x, y)
-                } else {
-                    if (valid) {
-                        sum += currentNumber.toInt()
-                    }
-                    currentNumber = ""
-                    valid = false
+        return points.asSequence()
+            .windowed(2)
+            .filter { it[0].digit }
+            .fold(mutableListOf(mutableListOf<Point>())) { numbers, window ->
+                val p1: Point = window[0]
+                val p2: Point? = window.getOrNull(1)
+                numbers.last().add(p1)
+                if (p2 == null || !p2.digit || p2.reset) {
+                    numbers.add(mutableListOf())
                 }
+                numbers
             }
-            if (valid) {
-                sum += currentNumber.toInt()
-            }
-
-        }
-        return sum
+            .filterNot { it.isEmpty() }
+            .filter { points -> points.any { point -> data.isValid(point) } }
+            .sumOf { points -> points.toInt() }
     }
 
     fun gearRatioSum(): Int {
@@ -68,7 +61,7 @@ private class Engine(private val data: List<List<Char>>) {
             for (y in data[0].indices) {
                 if (data[x][y].isDigit()) {
                     currentNumber += data[x][y]
-                    gears.addAll(gears(x, y))
+                    gears.addAll(data.gears(x, y))
                 } else {
                     addGearParts(gears, gearParts, currentNumber)
                     currentNumber = ""
@@ -98,41 +91,56 @@ private class Engine(private val data: List<List<Char>>) {
         }
     }
 
-    private fun isValid(x: Int, y: Int): Boolean =
-        neighbours(x, y)
-            .filterNotNull()
-            .filter { it.char != '.' }
-            .filterNot { it.char.isDigit() }
-            .any()
 
-    private fun gears(x: Int, y: Int): List<Gear> =
-        neighbours(x, y)
-            .filterNotNull()
-            .filter { it.char == '*' }
-            .map { Gear(it.x, it.y) }
-            .toList()
-
-    private fun neighbours(x: Int, y: Int) = sequenceOf(
-        valueAt(x - 1, y - 1),
-        valueAt(x, y - 1),
-        valueAt(x - 1, y),
-        valueAt(x - 1, y + 1),
-        valueAt(x + 1, y - 1),
-        valueAt(x + 1, y + 1),
-        valueAt(x, y + 1),
-        valueAt(x + 1, y),
-    )
-
-    private fun valueAt(x: Int, y: Int): Point? {
-        if (x < 0 || x >= maxX) {
-            return null
-        }
-        if (y < 0 || y >= maxY) {
-            return null
-        }
-        return Point(x, y, data[x][y])
-    }
-
-    private data class Gear(val x: Int, val y: Int)
-    private data class Point(val x: Int, val y: Int, val char: Char)
 }
+
+private fun List<List<Char>>.isValid(point: Point): Boolean =
+    this.neighbours(point.x, point.y)
+        .filterNotNull()
+        .filterNot { it.char == '.' }
+        .filterNot { it.char.isDigit() }
+        .any()
+
+private fun List<List<Char>>.gears(x: Int, y: Int): List<Gear> =
+    this.neighbours(x, y)
+        .filterNotNull()
+        .filter { it.char == '*' }
+        .map { Gear(it.x, it.y) }
+        .toList()
+
+private fun List<List<Char>>.neighbours(x: Int, y: Int) = sequenceOf(
+    valueAt(x - 1, y - 1),
+    valueAt(x, y - 1),
+    valueAt(x - 1, y),
+    valueAt(x - 1, y + 1),
+    valueAt(x + 1, y - 1),
+    valueAt(x + 1, y + 1),
+    valueAt(x, y + 1),
+    valueAt(x + 1, y),
+)
+
+private fun List<List<Char>>.valueAt(x: Int, y: Int): Point? {
+    if (x < 0 || x >= this.size) {
+        return null
+    }
+    if (y < 0 || y >= this[0].size) {
+        return null
+    }
+    return Point(x, y, this[x][y])
+}
+
+private fun MutableList<Point>.toInt() = this
+    .map { point -> point.char }
+    .joinToString(separator = "")
+    .toInt()
+
+private data class Gear(val x: Int, val y: Int)
+private data class Point(
+    val x: Int,
+    val y: Int,
+    val char: Char,
+    val digit: Boolean = char.isDigit(),
+    val symbol: Boolean = !(char.isDigit() || char == '.'),
+    val gear: Boolean = char == '*',
+    val reset: Boolean = y == 0
+)
