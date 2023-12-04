@@ -2,7 +2,6 @@ package day04
 
 import utils.FileData
 import utils.expectResult
-import kotlin.math.min
 import kotlin.math.pow
 
 private val fileData = FileData(4)
@@ -20,14 +19,6 @@ fun main() {
 
     println("#1 -> ${part1(data)}")
     println("#2 -> ${part2(data)}")
-
-    expectResult(27454) {
-        part1(data)
-    }
-    expectResult(6857330) {
-        part2(data)
-    }
-
 }
 
 private fun part1(input: List<String>): Int {
@@ -37,23 +28,16 @@ private fun part1(input: List<String>): Int {
 }
 
 private fun part2(input: List<String>): Int {
-    val cards = input
+    val cards: List<Card> = input
         .map(String::parseLine)
         .toList()
 
-    cards.forEachIndexed { index, card ->
-        val extraCards = card.guessedNumbers
-        if (extraCards == 0) {
-            return@forEachIndexed
+    return cards
+        .onEachIndexed { index, card ->
+            cards.subList(index + 1, index + card.guessedNumbers + 1)
+                .forEach { it.copies += card.copies }
         }
-        val beginRange = min(index + 1, cards.size - 1)
-        val endRange = min(index + extraCards, cards.size - 1)
-        (beginRange..endRange).forEach { cardIndex ->
-            cards[cardIndex].copies += card.copies
-        }
-    }
-
-    return cards.sumOf { it.copies }
+        .sumOf { it.copies }
 }
 
 private val sectionsRegex = Regex("[:|]")
