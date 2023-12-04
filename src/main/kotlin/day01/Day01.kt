@@ -1,16 +1,21 @@
+package day01
+
+import utils.FileData
 import utils.expectResult
-import utils.readInput
+
+private val fileData = FileData(1)
 
 fun main() {
     // test if implementation meets criteria from the description, like:
     expectResult(142) {
-        part1(readInput("Day01_1_test"))
+        part1(fileData.readTestData(1))
     }
     expectResult(281) {
-        part2(readInput("Day01_2_test"))
+        part2(fileData.readTestData(2))
     }
 
-    val data = readInput("Day01")
+    val data = fileData.readData()
+
     println("#1 -> ${part1(data)}")
     println("#2 -> ${part2(data)}")
 }
