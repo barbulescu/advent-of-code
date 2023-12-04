@@ -2,14 +2,21 @@ plugins {
     kotlin("jvm") version "1.9.20"
 }
 
-sourceSets {
-    main {
-        kotlin.srcDir("src")
-    }
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }
+
+
 
 tasks {
     wrapper {
         gradleVersion = "8.5"
     }
 }
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+}
+

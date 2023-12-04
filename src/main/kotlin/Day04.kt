@@ -61,7 +61,7 @@ private fun String.parseNumbers() = this.split(" ")
     .filterNot { it.isBlank() }
     .map { it.toInt() }
 
-data class Card(val index: Int, val winningNumbers: List<Int>, val numbers: List<Int>, var copies: Int = 1) {
+internal data class Card(val index: Int, val winningNumbers: List<Int>, val numbers: List<Int>, var copies: Int = 1) {
     fun calculatePoints(): Int {
         val intersect: Set<Int> = winningNumbers.intersect(numbers)
         var points = 0
