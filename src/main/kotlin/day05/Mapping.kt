@@ -1,5 +1,8 @@
 package day05
 
+import java.util.stream.Stream
+import kotlin.streams.asSequence
+
 data class MappingData(
     val seed2soil: Mapping,
     val soil2fertilizer: Mapping,
@@ -18,7 +21,6 @@ data class MappingData(
             .map(light2temperature::map)
             .map(temperature2humidity::map)
             .map(humidity2location::map)
-//            .onEach { println("min=$it") }
             .min()
     }
 }
