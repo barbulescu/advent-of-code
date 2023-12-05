@@ -18,6 +18,7 @@ data class MappingData(
             .map(light2temperature::map)
             .map(temperature2humidity::map)
             .map(humidity2location::map)
+//            .onEach { println("min=$it") }
             .min()
     }
 }

@@ -10,9 +10,9 @@ fun main() {
     expectLongResult(35) {
         part1(fileData.readTestData(1))
     }
-//    expectLongResult(46) {
-//        part2(fileData.readTestData(2))
-//    }
+    expectLongResult(46) {
+        part2(fileData.readTestData(2))
+    }
 
     val data = fileData.readData()
 
@@ -28,11 +28,23 @@ private fun part1(input: List<String>): Long {
 
     val mappingData = parseMappingData(input)
     return mappingData.findLowestLocation(seeds.asSequence())
-
 }
 
 private fun part2(input: List<String>): Long {
-    return -1
+    val seeds: Sequence<Long> = input.first()
+        .drop(6)
+        .split(" ")
+        .asSequence()
+        .filterNot(String::isBlank)
+        .map { it.toLong() }
+        .windowed(2,2)
+        .map { it[0]..<it[1] + it[0] }
+        .onEach { println(it) }
+        .flatMap { it.asSequence() }
+
+
+    val mappingData = parseMappingData(input)
+    return mappingData.findLowestLocation(seeds)
 }
 
 fun parseMappingData(input: List<String>): MappingData {
