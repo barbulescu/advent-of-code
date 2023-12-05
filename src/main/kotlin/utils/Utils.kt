@@ -2,8 +2,6 @@ package utils
 
 import java.math.BigInteger
 import java.security.MessageDigest
-import kotlin.io.path.Path
-import kotlin.io.path.readLines
 
 /**
  * Converts string to md5 hash.
@@ -14,6 +12,13 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
 
 
 fun expectResult(expected: Int, processor: () -> Int) {
+    val actual = processor.invoke()
+    if (actual != expected) {
+        error("Expected $expected but received $actual")
+    }
+}
+
+fun expectLongResult(expected: Long, processor: () -> Long) {
     val actual = processor.invoke()
     if (actual != expected) {
         error("Expected $expected but received $actual")
