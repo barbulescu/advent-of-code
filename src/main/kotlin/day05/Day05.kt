@@ -2,7 +2,6 @@ package day05
 
 import utils.FileData
 import utils.expectLongResult
-import utils.expectResult
 
 private val fileData = FileData(5)
 
@@ -11,7 +10,7 @@ fun main() {
     expectLongResult(35) {
         part1(fileData.readTestData(1))
     }
-//    expectResult(1) {
+//    expectLongResult(46) {
 //        part2(fileData.readTestData(2))
 //    }
 
@@ -22,17 +21,21 @@ fun main() {
 }
 
 private fun part1(input: List<String>): Long {
-    return parseData(input)
-        .findLowestLocation()
+    val seeds = input.first().drop(6)
+        .split(" ")
+        .filterNot(String::isBlank)
+        .map { it.toLong() }
+
+    val mappingData = parseMappingData(input)
+    return mappingData.findLowestLocation(seeds.asSequence())
 
 }
 
-private fun part2(input: List<String>): Int {
+private fun part2(input: List<String>): Long {
     return -1
 }
 
-fun parseData(input: List<String>): SeedData {
-    val seeds = parseSeedLine(input.first())
+fun parseMappingData(input: List<String>): MappingData {
     var sectionReset = false
     var sectionTitle: String? = null
     val sectionContent = mutableListOf<String>()
@@ -57,8 +60,7 @@ fun parseData(input: List<String>): SeedData {
     if (sectionTitle != null) {
         sections[sectionTitle!!] = parseSection(sectionContent)
     }
-    return SeedData(
-        seeds,
+    return MappingData(
         sections.toMapping("seed-to-soil map:"),
         sections.toMapping("soil-to-fertilizer map:"),
         sections.toMapping("fertilizer-to-water map:"),
@@ -68,12 +70,6 @@ fun parseData(input: List<String>): SeedData {
         sections.toMapping("humidity-to-location map:"),
     )
 }
-
-fun parseSeedLine(line: String): List<Long> =
-    line.drop(6)
-        .split(" ")
-        .filterNot(String::isBlank)
-        .map { it.toLong() }
 
 fun parseSection(lines: List<String>): List<MappingItem> = lines.map(String::parseSectionLine)
 

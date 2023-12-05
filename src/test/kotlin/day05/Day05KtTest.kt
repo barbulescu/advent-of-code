@@ -7,7 +7,10 @@ class Day05KtTest {
 
     @Test
     fun `parse seed line`() {
-        val seeds = parseSeedLine("seeds: 79 14 55 13")
+        val seeds = "seeds: 79 14 55 13".drop(6)
+            .split(" ")
+            .filterNot(String::isBlank)
+            .map { it.toLong() }
         assertThat(seeds).containsExactly(79, 14, 55, 13)
     }
 
