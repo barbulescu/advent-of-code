@@ -36,7 +36,7 @@ fun parseMappingData(input: List<String>): CascadeMapping {
     )
 }
 
-fun parseSection(lines: List<String>): List<MappingItem> = lines.map(String::parseSectionLine)
+fun parseSection(lines: List<String>): List<MappingItem> = lines.map(String::parseSectionLine).sortedBy { it.source.first }
 
 private fun String.parseSectionLine(): MappingItem {
     val parts = this.split(" ")

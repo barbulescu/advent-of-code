@@ -10,9 +10,9 @@ fun main() {
     expectLongResult(35) {
         part1(fileData.readTestData(1))
     }
-//    expectLongResult(46) {
-//        part2(fileData.readTestData(2))
-//    }
+    expectLongResult(46) {
+        part2(fileData.readTestData(2))
+    }
 
     val data = fileData.readData()
 
