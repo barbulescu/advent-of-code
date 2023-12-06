@@ -4,11 +4,16 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class MappingTest {
-    private val initial = Mapping(
-        listOf(
-            MappingItem(2L..5, 6)
-        )
+    private val initial = listOf(
+        (2..5).toItem(6)
     )
+
+
+    @Test
+    fun `single range match`() {
+        val actual = initial.mergeWith(3L..3)
+        assertThat(actual).containsExactly(7L..7)
+    }
 
     @Test
     fun `before range`() {
@@ -30,12 +35,11 @@ class MappingTest {
 
     @Test
     fun `seed to soil merge`() {
-        val mapping = Mapping(
-            listOf(
-                MappingItem(98L..99, 50),
-                MappingItem(50L..97, 52)
-            )
+        val mapping = listOf(
+            (98..99).toItem(50),
+            (50..97).toItem(52)
         )
+
         val input = listOf(79L..92, 55L..67)
         val actual = input.flatMap { mapping.mergeWith(it) }
         println(actual)

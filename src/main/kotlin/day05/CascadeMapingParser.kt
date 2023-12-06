@@ -1,6 +1,6 @@
 package day05
 
-fun parseMappingData(input: List<String>): MappingData {
+fun parseMappingData(input: List<String>): CascadeMapping {
     var sectionReset = false
     var sectionTitle: String? = null
     val sectionContent = mutableListOf<String>()
@@ -25,7 +25,7 @@ fun parseMappingData(input: List<String>): MappingData {
     if (sectionTitle != null) {
         sections[sectionTitle!!] = parseSection(sectionContent)
     }
-    return MappingData(
+    return CascadeMapping(
         sections.toMapping("seed-to-soil map:"),
         sections.toMapping("soil-to-fertilizer map:"),
         sections.toMapping("fertilizer-to-water map:"),

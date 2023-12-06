@@ -26,3 +26,5 @@ class Day05KtTest {
         assertThat(items).containsExactly(item1, item2)
     }
 }
+
+fun IntRange.toItem(destination: Int) = MappingItem(this.first.toLong()..this.last.toLong(), destination.toLong())
