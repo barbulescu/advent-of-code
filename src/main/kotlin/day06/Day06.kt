@@ -2,7 +2,6 @@ package day06
 
 import utils.FileData
 import utils.expectLongResult
-import utils.expectResult
 
 private val fileData = FileData(6)
 
@@ -21,47 +20,57 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Long {
-    return input.parseRaceRecords().countAllWinCases()
-}
+private fun part1(input: List<String>): Long =
+    input.parseRaceRecords().countWinCases()
 
 private fun part2(input: List<String>): Long {
     require(input.size == 2) { "expect 2 lines but got got $input" }
     val race = Race(
-        time = String(input[0].drop(5).toCharArray().filterNot { it == ' ' }.toCharArray()).toLong(),
-         distance = String(input[1].drop(10).toCharArray().filterNot { it == ' ' }.toCharArray()).toLong()
+        time = input[0]
+            .drop(5)
+            .innerTrim()
+            .toLong(),
+        distance = input[1]
+            .drop(10)
+            .innerTrim()
+            .toLong()
     )
-    return race.validWinCases()
+    return race.countWinCases()
 }
+
+private fun String.innerTrim() =
+    this.toCharArray().filterNot { it == ' ' }.joinToString(separator = "")
 
 val separatorRegex = Regex(" +")
 
-fun List<String>.parseRaceRecords(): RaceRecords {
+fun List<String>.parseRaceRecords(): List<Race> {
     require(this.size == 2) { "expect 2 lines but got got $this" }
     val times = this[0].drop(5)
         .split(separatorRegex)
         .filterNot(String::isBlank)
-        .map(String::toInt)
+        .map(String::toLong)
     val distances = this[1].drop(10)
         .split(separatorRegex)
         .filterNot(String::isBlank)
-        .map(String::toInt)
+        .map(String::toLong)
 
     require(times.size == distances.size) { "times and distances count must be the same" }
 
     val raceRecords = times.zip(distances)
-        .map { Race(it.first.toLong(), it.second.toLong()) }
-    return RaceRecords(raceRecords)
+        .map { Race(it.first, it.second) }
+    return raceRecords
 }
 
-data class RaceRecords(val races: List<Race>) {
-    fun countAllWinCases() = races.map { it.validWinCases() }.fold(1L) {acc, i -> acc * i }
-}
+
+fun List<Race>.countWinCases() = this
+    .map(Race::countWinCases)
+    .fold(1L) { acc, i -> acc * i }
+
 
 data class Race(val time: Long, val distance: Long) {
     fun canBeatRecord(pressTime: Long) = (time - pressTime) * pressTime > distance
 
-    fun validWinCases() : Long = (0..time)
+    fun countWinCases(): Long = (0..time)
         .asSequence()
         .filter { canBeatRecord(it) }
         .count()

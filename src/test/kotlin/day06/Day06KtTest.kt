@@ -13,11 +13,11 @@ class Day06KtTest {
         """.trimMargin()
 
         val actual = text.lines().parseRaceRecords()
-        val expected = RaceRecords(listOf(
+        val expected = listOf(
             Race(7, 9),
             Race(15, 40),
             Race(30, 200),
-        ))
+        )
         assertThat(actual).isEqualTo(expected)
     }
 }
