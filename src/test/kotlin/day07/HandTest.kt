@@ -8,7 +8,7 @@ class HandTest {
     @Test
     fun `sort correctly`() {
         val input = listOf("32T3K", "T55J5", "KK677", "KTJJT", "QQQJA")
-            .map { Hand(it) }
+            .map { Hand(it, labelsPart1, Map<Char, Int>::calculatePowerPart1) }
 
         val actual = input.sorted().map { it.cards }
 

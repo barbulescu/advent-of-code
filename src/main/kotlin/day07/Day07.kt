@@ -10,9 +10,9 @@ fun main() {
     expectResult(6440) {
         part1(fileData.readTestData(1))
     }
-//    expectResult(1) {
-//        part2(fileData.readTestData(2))
-//    }
+    expectResult(5905) {
+        part2(fileData.readTestData(2))
+    }
 
     val data = fileData.readData()
 
@@ -20,19 +20,28 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Int = input
-    .map(String::parseLine)
-    .sorted()
-    .mapIndexed { index: Int, bid: Bid -> bid.amount * (index + 1) }
-    .sum()
+val labelsPart1 = listOf('A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2')
+val labelsPart2 = listOf('A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J')
+
+private fun part1(input: List<String>): Int {
+
+    return input
+        .map { it.parseLine(labelsPart1, Map<Char, Int>::calculatePowerPart1) }
+        .sorted()
+        .mapIndexed { index: Int, bid: Bid -> bid.amount * (index + 1) }
+        .sum()
+}
 
 private fun part2(input: List<String>): Int {
-    return -1
+
+    return input
+        .map { it.parseLine(labelsPart2, Map<Char, Int>::calculatePowerPart2) }
+        .sorted()
+        .mapIndexed { index: Int, bid: Bid -> bid.amount * (index + 1) }
+        .sum()
 }
 
-fun String.parseLine(): Bid {
-    return Bid(
-        hand = Hand(this.take(5)),
-        amount = this.drop(6).toInt()
-    )
-}
+fun String.parseLine(labels: List<Char>, powerCalculator: (Map<Char, Int>) -> Int) = Bid(
+    hand = Hand(this.take(5), labels, powerCalculator),
+    amount = this.drop(6).toInt()
+)
