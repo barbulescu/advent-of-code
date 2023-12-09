@@ -2,7 +2,6 @@ package day09
 
 import utils.FileData
 import utils.expectLongResult
-import java.awt.Color.red
 
 private val fileData = FileData(9)
 
@@ -11,28 +10,26 @@ fun main() {
     expectLongResult(114) {
         part1(fileData.readTestData(1))
     }
-//    expectResult(1) {
-//        part2(fileData.readTestData(2))
-//    }
+    expectLongResult(2) {
+        part2(fileData.readTestData(2))
+    }
 
     val data = fileData.readData()
 
     println("#1 -> ${part1(data)}")
-//    println("#2 -> ${part2(data)}")
+    println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Long {
-    return input
-        .asSequence()
-        .map(String::parseLine)
-//        .filter(List<Long>::allZero)
-        .sumOf { calculateNext(it) }
+private fun part1(input: List<String>): Long = input
+    .asSequence()
+    .map(String::parseLine)
+    .sumOf(List<Long>::calculateNext)
 
-}
-
-private fun part2(input: List<String>): Long {
-    return -1
-}
+private fun part2(input: List<String>): Long = input
+    .asSequence()
+    .map(String::parseLine)
+    .map { it.reversed() }
+    .sumOf(List<Long>::calculateNext)
 
 private fun String.parseLine(): List<Long> = this
     .split(" ")
@@ -40,13 +37,13 @@ private fun String.parseLine(): List<Long> = this
 
 private fun List<Long>.allZero() = this.all { it == 0L }
 
-private fun calculateNext(numbers: List<Long>) : Long {
-    val lastValues = mutableListOf(numbers.last())
-    var temp = numbers
-    while(!temp.allZero()) {
-        temp = temp.windowed(size = 2, partialWindows = false)
+private fun List<Long>.calculateNext() : Long {
+    val lastValues = mutableListOf(this.last())
+    var current = this
+    while(!current.allZero()) {
+        current = current.windowed(size = 2, partialWindows = false)
             .map { it[1] - it[0] }
-        lastValues.add(temp.last())
+        lastValues.add(current.last())
     }
     return lastValues.reversed().reduce { acc, l -> acc + l}
 }
