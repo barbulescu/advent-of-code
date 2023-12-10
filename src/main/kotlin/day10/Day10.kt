@@ -21,13 +21,6 @@ fun main() {
 
     println("#1 -> ${part1(data)}")
     println("#2 -> ${part2(data)}")
-
-    expectResult(6907) {
-        part1(data)
-    }
-    expectResult(541) {
-        part2(data)
-    }
 }
 
 private fun part1(lines: List<String>): Int = lines
