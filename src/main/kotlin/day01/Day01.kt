@@ -20,10 +20,9 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun processLine(line: String) = line.toCharArray()
-    .asSequence()
-    .filter(Char::isDigit)
-    .map(Char::digitToInt)
+private fun part1(lines: List<String>): Int = lines.convertAndSum { it }
+
+private fun part2(lines: List<String>): Int = lines.convertAndSum { preProcessLine(it) }
 
 private fun preProcessLine(line: String): String = line
     .replace("one", "o1e")
@@ -36,9 +35,10 @@ private fun preProcessLine(line: String): String = line
     .replace("eight", "e8ght")
     .replace("nine", "n9ne")
 
-private fun part1(input: List<String>): Int = input.convertAndSum { it }
-
-private fun part2(input: List<String>): Int = input.convertAndSum { preProcessLine(it) }
+private fun processLine(line: String) = line.toCharArray()
+    .asSequence()
+    .filter(Char::isDigit)
+    .map(Char::digitToInt)
 
 private fun List<String>.convertAndSum(preProcessor: (String) -> String): Int = this
     .asSequence()

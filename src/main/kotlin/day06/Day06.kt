@@ -20,17 +20,17 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Long =
-    input.parseRaceRecords().countWinCases()
+private fun part1(lines: List<String>): Long =
+    lines.parseRaceRecords().countWinCases()
 
-private fun part2(input: List<String>): Long {
-    require(input.size == 2) { "expect 2 lines but got got $input" }
+private fun part2(lines: List<String>): Long {
+    require(lines.size == 2) { "expect 2 lines but got got $lines" }
     val race = Race(
-        time = input[0]
+        time = lines[0]
             .drop(5)
             .innerTrim()
             .toLong(),
-        distance = input[1]
+        distance = lines[1]
             .drop(10)
             .innerTrim()
             .toLong()

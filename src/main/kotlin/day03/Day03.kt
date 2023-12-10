@@ -19,13 +19,13 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Int = input
+private fun part1(lines: List<String>): Int = lines
     .toGrid()
     .asNumbers()
     .filter(Number::hasAdjacentSymbol)
     .sumOf(Number::toInt)
 
-private fun part2(input: List<String>): Int = input
+private fun part2(lines: List<String>): Int = lines
     .toGrid()
     .asNumbers()
     .flatMap(Number::findGears)
@@ -36,13 +36,15 @@ private fun part2(input: List<String>): Int = input
 
 private fun Grid.asNumbers() = this
     .asPoints()
+    .map { it to this.getValue(it) }
     .windowed(2)
-    .filter { it[0].isDigit() }
+    .filter { it[0].second.isDigit() }
     .fold(mutableListOf(Number(this))) { numbers, window ->
-        val p1: Point = window[0]
-        val p2: Point? = window.getOrNull(1)
+        val p1: Point = window[0].first
+        val p2: Point? = window.getOrNull(1)?.first
+        val p2Char: Char = window.getOrNull(1)?.second!!
         numbers.last().addPoint(p1)
-        if (p2 == null || !p2.isDigit() || p2.isFirstColumn()) {
+        if (p2 == null || !p2Char.isDigit() || p2.isFirstColumn()) {
             numbers.add(Number(this))
         }
         numbers
@@ -60,7 +62,7 @@ private data class Number(private val grid: Grid, private val data: MutableList<
     fun isNotEmpty() = data.isNotEmpty()
 
     fun toInt() = data
-        .map(Point::char)
+        .map { grid.getValue(it) }
         .joinToString(separator = "")
         .toInt()
 
@@ -68,8 +70,9 @@ private data class Number(private val grid: Grid, private val data: MutableList<
 
     private fun Point.hasAdjacentSymbol(): Boolean =
         grid.neighbours(x, y)
-            .filterNot { it.char == '.' }
-            .filterNot { it.char.isDigit() }
+            .map { grid.getValue(it) }
+            .filterNot { it == '.' }
+            .filterNot { it.isDigit() }
             .any()
 
     fun findGears(): List<Pair<Gear, Int>> =
@@ -79,7 +82,7 @@ private data class Number(private val grid: Grid, private val data: MutableList<
 
     private fun Point.findGears(): Sequence<Gear> =
         grid.neighbours(x, y)
-            .filter { it.char == '*' }
+            .filter { grid.getValue(it) == '*' }
             .map { Gear(it.x, it.y) }
 
 }

@@ -27,16 +27,16 @@ private const val MAX_BLUE = 14
 private val mainGroupsRegex = Regex("[:;]")
 private val setRegex = Regex("\\s*(\\d+)\\s+(\\w+)")
 
-private fun part1(input: List<String>): Int {
-    return input.asSequence()
+private fun part1(lines: List<String>): Int {
+    return lines.asSequence()
         .map(String::parseLine)
         .filter(Game::isValid)
         .map(Game::id)
         .sum()
 }
 
-private fun part2(input: List<String>): Int {
-    return input.asSequence()
+private fun part2(lines: List<String>): Int {
+    return lines.asSequence()
         .map(String::parseLine)
         .map(Game::power)
         .sum()

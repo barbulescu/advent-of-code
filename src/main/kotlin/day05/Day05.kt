@@ -2,7 +2,6 @@ package day05
 
 import utils.FileData
 import utils.expectLongResult
-import kotlin.streams.asStream
 
 private val fileData = FileData(5)
 
@@ -31,8 +30,8 @@ private fun part1(input: List<String>): Long {
     return mappingData.findLowestLocation(seeds.asSequence())
 }
 
-private fun part2(input: List<String>): Long {
-    val seeds = input.first()
+private fun part2(lines: List<String>): Long {
+    val seeds = lines.first()
         .drop(6)
         .split(" ")
         .asSequence()
@@ -43,16 +42,16 @@ private fun part2(input: List<String>): Long {
         .onEach { println(it) }
         .flatMap { it.asSequence() }
 
-    val mappingData = parseMappingData(input)
+    val mappingData = parseMappingData(lines)
     return mappingData.findLowestLocation(seeds)
 }
 
-fun parseMappingData(input: List<String>): MappingData {
+fun parseMappingData(lines: List<String>): MappingData {
     var sectionReset = false
     var sectionTitle: String? = null
     val sectionContent = mutableListOf<String>()
     val sections = mutableMapOf<String, List<MappingItem>>()
-    input.forEach { line ->
+    lines.forEach { line ->
         if (line.isBlank()) {
             sectionReset = true
             if (sectionTitle != null) {

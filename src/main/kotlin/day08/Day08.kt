@@ -30,9 +30,9 @@ fun main() {
 
 }
 
-private fun part1(input: List<String>): Int {
-    val instructions = Instructions(input.first())
-    val map = parseInput(input)
+private fun part1(lines: List<String>): Int {
+    val instructions = Instructions(lines.first())
+    val map = parseInput(lines)
 
     var steps = 0
     var current = "AAA"
@@ -45,9 +45,9 @@ private fun part1(input: List<String>): Int {
     return steps
 }
 
-private fun part2(input: List<String>): Long {
-    val instructions = Instructions(input.first())
-    val map = parseInput(input)
+private fun part2(lines: List<String>): Long {
+    val instructions = Instructions(lines.first())
+    val map = parseInput(lines)
     return map.keys
         .filter { it.endsWith("A") }
         .map { startingPoint -> instructions.countSteps2(startingPoint, map) }

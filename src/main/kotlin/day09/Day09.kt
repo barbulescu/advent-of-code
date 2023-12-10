@@ -20,12 +20,12 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Long = input
+private fun part1(lines: List<String>): Long = lines
     .asSequence()
     .map(String::parseLine)
     .sumOf(List<Long>::calculateNext)
 
-private fun part2(input: List<String>): Long = input
+private fun part2(lines: List<String>): Long = lines
     .asSequence()
     .map(String::parseLine)
     .map { it.reversed() }

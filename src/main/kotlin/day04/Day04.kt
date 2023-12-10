@@ -21,14 +21,14 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Int {
-    return input
+private fun part1(lines: List<String>): Int {
+    return lines
         .map(String::parseLine)
         .sumOf(Card::calculatePoints)
 }
 
-private fun part2(input: List<String>): Int {
-    val cards: List<Card> = input
+private fun part2(lines: List<String>): Int {
+    val cards: List<Card> = lines
         .map(String::parseLine)
         .toList()
 
