@@ -18,10 +18,10 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(input: List<String>): Int {
+private fun part1(lines: List<String>): Int {
     return -1
 }
 
-private fun part2(input: List<String>): Int {
+private fun part2(lines: List<String>): Int {
     return -1
 }
