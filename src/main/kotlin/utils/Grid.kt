@@ -77,3 +77,13 @@ fun List<String>.toGrid() = Grid(
 )
 
 fun List<Char>.toPoints(x: Int) = List(this.size) { y -> Point(x, y) }
+
+fun List<String>.toArea(): Map<Point, Char> {
+    return mutableMapOf<Point, Char>().also {
+        forEachIndexed { y, row ->
+            row.forEachIndexed { x, char ->
+                it[Point(x, y)] = char
+            }
+        }
+    }
+}
