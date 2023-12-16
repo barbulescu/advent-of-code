@@ -21,14 +21,6 @@ fun main() {
 
     println("#1 -> ${part1(data)}")
     println("#2 -> ${part2(data)}")
-
-    expectResult(6795) {
-        part1(data)
-    }
-    expectResult(7154) {
-        part2(data)
-    }
-
 }
 
 private fun part1(lines: List<String>): Int = lines.toArea()
