@@ -6,10 +6,14 @@ kotlin = "2.1.0"
 junit = "5.10.1"
 assertj = "3.26.3"
 coroutines = "1.8.1"
+versions = "0.41.0"
+version-catalog-update = "0.8.5"
 
 [libraries]
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref="coroutines" }
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }
+version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

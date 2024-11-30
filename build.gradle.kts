@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     `java-library`
+    alias(libs.plugins.versions)
+    alias(libs.plugins.version.catalog.update)
 }
 
 repositories {
