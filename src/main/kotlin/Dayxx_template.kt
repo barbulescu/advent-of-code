@@ -1,7 +1,7 @@
 import utils.FileData
 import utils.expectResult
 
-private val fileData = FileData(0)
+private val fileData = FileData(day = 0, year = 2024)
 
 fun main() {
     // test if implementation meets criteria from the description, like:

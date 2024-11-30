@@ -1,24 +1,27 @@
 plugins {
-    kotlin("jvm") version "1.9.21"
+    alias(libs.plugins.kotlin.jvm)
+    `java-library`
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-    testImplementation("org.assertj:assertj-core:3.24.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
+    implementation(libs.coroutines)
+    testImplementation(libs.assertj)
 }
 
-
-
-tasks {
-    wrapper {
-        gradleVersion = "8.5"
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter(libs.versions.junit)
+        }
     }
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
-

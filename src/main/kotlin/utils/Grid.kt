@@ -40,7 +40,7 @@ data class Point(val x: Int, val y: Int) {
 
 }
 
-class Grid(private val data: List<List<Char>>) {
+class Grid<T>(private val data: List<List<T>>) {
     fun asPoints() = data
         .asSequence()
         .flatMapIndexed { x, chars -> chars.toPoints(x) }
@@ -67,16 +67,16 @@ class Grid(private val data: List<List<Char>>) {
         return Point(x, y)
     }
 
-    fun getValue(point: Point) : Char = data[point.x][point.y]
+    fun getValue(point: Point) : T = data[point.x][point.y]
 }
 
-fun List<String>.toGrid() = Grid(
+fun <T> List<String>.toGrid(mapper: (Char) -> T) = Grid(
     this
         .map(String::toCharArray)
-        .map(CharArray::toList)
+        .map { it.map(mapper).toList() }
 )
 
-fun List<Char>.toPoints(x: Int) = List(this.size) { y -> Point(x, y) }
+fun <T> List<T>.toPoints(x: Int) = List(this.size) { y -> Point(x, y) }
 
 fun List<String>.toArea(): Map<Point, Char> {
     return mutableMapOf<Point, Char>().also {
