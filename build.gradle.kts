@@ -17,7 +17,7 @@ dependencies {
 testing {
     suites {
         val test by getting(JvmTestSuite::class) {
-            useJUnitJupiter(libs.versions.junit)
+            useJUnitJupiter(libs.versions.jupiter)
         }
     }
 }
