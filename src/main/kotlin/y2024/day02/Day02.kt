@@ -17,8 +17,12 @@ fun main() {
 
     val data = fileData.readData()
 
-    println("#1 -> ${part1(data)}")
-    println("#2 -> ${part2(data)}")
+    val part1 = part1(data)
+    println("#1 -> $part1")
+    require(part1 == 165)
+    val part2 = part2(data)
+    println("#2 -> $part2")
+    require(part2 == 660)
 }
 
 private fun part1(lines: List<String>): Int = lines
@@ -39,8 +43,8 @@ private fun String.toLevels() = this
 
 private fun List<Int>.isSafe(): Boolean {
     val differences = this
-        .windowed(2)
-        .map { it[0] - it[1] }
+        .zipWithNext()
+        .map { it.first - it.second }
 
     val smoothTransitions = differences.asSequence()
         .map { abs(it) }
