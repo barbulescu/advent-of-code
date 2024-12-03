@@ -19,35 +19,21 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-private fun part1(lines: List<String>): Long {
-    return lines.sumOf { it.processLine1() }
-}
+private fun part1(lines: List<String>): Long = lines
+    .sumOf(String::processOperations)
 
 private fun part2(lines: List<String>): Long {
     val fullLine = lines.joinToString(separator = "")
-    val disabled = fullLine.split("don't()")
-    println("------")
-    println("1> ${disabled[0]}")
-    return disabled
-        .asSequence()
-        .onEach { println("1> $it") }
-        .mapIndexed {index, it->
-            if (index == 0) {
-                it
-            } else {
-                var value = it.substringAfter("do()")
-                if (it == value) {
-                    value = ""
-                }
-                value
-            }
-        }
-        .onEach { println("2> $it") }
-        .sumOf { it.processLine1() }
+    val parts = fullLine.split("don't()")
+    val sequence = sequenceOf(parts[0]) + parts.asSequence()
+        .drop(1)
+        .map { it.substringAfter("do()", "") }
+    return sequence.sumOf(String::processOperations)
 }
 
 private val regex = "mul\\((\\d+),(\\d+)\\)".toRegex()
 
-private fun String.processLine1(): Long = regex.findAll(this)
+private fun String.processOperations(): Long = regex
+    .findAll(this)
     .map { it.groupValues[1].toLong() * it.groupValues[2].toLong() }
     .sum()
