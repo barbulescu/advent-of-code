@@ -50,18 +50,18 @@ private fun List<String>.part2(): Long {
     val data = map { it.toByteArray().toList() }
         .toList()
 
-    val indices = data.indices
-    var count = 0L
     val expectedValues = listOf(sam, mas)
-    indices.windowed(3).forEach { row ->
-        indices.windowed(3).forEach { col ->
-            val s1 = listOf(data[row[0]][col[0]], data[row[1]][col[1]], data[row[2]][col[2]])
-            val s2 = listOf(data[row[0]][col[2]], data[row[1]][col[1]], data[row[2]][col[0]])
+    return data.indices
+        .windowed(3)
+        .sumOf { row ->
+            data.indices
+                .windowed(3)
+                .count { col ->
+                    val diagonal1 = listOf(data[row[0]][col[0]], data[row[1]][col[1]], data[row[2]][col[2]])
+                    val diagonal2 = listOf(data[row[0]][col[2]], data[row[1]][col[1]], data[row[2]][col[0]])
 
-            if (s1 in expectedValues && s2 in expectedValues) {
-                count++
-            }
+                    diagonal1 in expectedValues && diagonal2 in expectedValues
+                }
         }
-    }
-    return count
+        .toLong()
 }
