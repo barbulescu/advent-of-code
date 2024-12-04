@@ -9,34 +9,27 @@ fun main() {
 
 private fun List<String>.part1(): Long {
     val (left, right) = parseLists(this)
-    left.sort()
-    right.sort()
+    val sortedLeft = left.sorted()
+    val sortedRight = right.sorted()
 
-    return left.indices
-        .sumOf { abs(left[it] - right[it]) }
+    return sortedLeft
+        .indices
+        .sumOf { abs(sortedLeft[it] - sortedRight[it]) }
         .toLong()
 }
 
 private fun List<String>.part2(): Long {
     val (left, right) = parseLists(this)
-    val rightCounts = right.groupingBy { it }.eachCount()
+    val rightCounts = right
+        .groupingBy { it }
+        .eachCount()
     return left
-        .sumOf {
-            val count = rightCounts[it] ?: 0
-            it * count
-        }
+        .sumOf { it * (rightCounts[it] ?: 0) }
         .toLong()
 }
 
-private fun parseLists(lines: List<String>): Pair<MutableList<Int>, MutableList<Int>> {
-    val left = mutableListOf<Int>()
-    val right = mutableListOf<Int>()
-    lines.forEach { line ->
-        val parts = line.split("   ")
-        require(parts.size == 2) { "Invalid line: $line" }
-        left.add(parts[0].toInt())
-        right.add(parts[1].toInt())
-    }
-    require(left.size == right.size) { "Different size detected: $left - $right" }
-    return Pair(left, right)
-}
+private fun parseLists(lines: List<String>): Pair<List<Int>, List<Int>> = lines
+    .asSequence()
+    .map { line -> line.split("   ").map(String::toInt) }
+    .map { line -> line[0] to line[1] }
+    .unzip()
