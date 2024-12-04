@@ -1,7 +1,6 @@
 package y2024.day04
 
 import utils.FileData
-import utils.expectLongResult
 import utils.expectResult
 
 private val fileData = FileData(day = 4, year = 2024)
@@ -10,7 +9,7 @@ fun main() {
     expectResult(18) {
         part1(fileData.readTestData(1))
     }
-    expectLongResult(-1) {
+    expectResult(9) {
         part2(fileData.readTestData(2))
     }
 
@@ -34,7 +33,7 @@ private fun part1(lines: List<String>): Int {
 
     val horizontalCount = data
         .flatMap { it.windowed(4) }
-        .count { it == search || it == searchBackwards}
+        .count { it == search || it == searchBackwards }
 
     val verticalCount = data.findVerticalMatches()
     val diagonalDown = data.findDiagonalDown()
@@ -114,7 +113,26 @@ private fun List<List<Byte>>.findDiagonalUp(): Int {
     return count
 }
 
+val mas = listOf(m, a, s)
+val sam = listOf(s, a, m)
 
-private fun part2(lines: List<String>): Long {
-    return -1
+private fun part2(lines: List<String>): Int {
+    val data = lines.map { it.toByteArray().toList() }
+        .toList()
+
+    val indices = data.indices
+    var count = 0
+    val expectedValues = listOf(sam, mas)
+    indices.windowed(3).forEach { row ->
+        indices.windowed(3).forEach { col ->
+            val s1 = listOf(data[row[0]][col[0]], data[row[1]][col[1]], data[row[2]][col[2]])
+            val s2 = listOf(data[row[0]][col[2]], data[row[1]][col[1]], data[row[2]][col[0]])
+
+            if (s1 in expectedValues && s2 in expectedValues) {
+                count++
+                println("found on row $row and col $col: $s1 <> $s2")
+            }
+        }
+    }
+    return count
 }
