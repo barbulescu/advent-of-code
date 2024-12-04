@@ -1,22 +1,9 @@
 package y2024.day04
 
-import utils.FileData
-import utils.expectResult
-
-private val fileData = FileData(day = 4, year = 2024)
+import utils.executeDay
 
 fun main() {
-    expectResult(18) {
-        part1(fileData.readTestData(1))
-    }
-    expectResult(9) {
-        part2(fileData.readTestData(2))
-    }
-
-    val data = fileData.readData()
-
-    println("#1 -> ${part1(data)}")
-    println("#2 -> ${part2(data)}")
+    executeDay(List<String>::part1, List<String>::part2)
 }
 
 const val x = 88.toByte()
@@ -24,18 +11,16 @@ const val m = 77.toByte()
 const val a = 65.toByte()
 const val s = 83.toByte()
 
-private fun part1(lines: List<String>): Int {
+private fun List<String>.part1(): Long {
     val xmas = listOf(x, m, a, s)
     val samx = listOf(s, a, m, x)
 
-    val data = lines.map { it.toByteArray().toList() }
+    val data = map { it.toByteArray().toList() }
         .toList()
 
     fun List<List<Byte>>.extract(rows: List<Int>, cols: List<Int>): List<Byte> {
         require(rows.size == cols.size)
-        return rows.indices.map {
-            this[rows[it]][cols[it]]
-        }
+        return rows.indices.map { this[rows[it]][cols[it]] }
     }
 
     fun count(col: List<Int>, transformation: (List<Int>) -> List<Int> = { it }) = data.indices
@@ -55,18 +40,18 @@ private fun part1(lines: List<String>): Int {
     val diagonalCount = data.indices
         .windowed(4)
         .sumOf { row -> count(row, List<Int>::reversed) }
-    return count + diagonalCount
+    return (count + diagonalCount).toLong()
 }
 
-private fun part2(lines: List<String>): Int {
+private fun List<String>.part2(): Long {
     val mas = listOf(m, a, s)
     val sam = listOf(s, a, m)
 
-    val data = lines.map { it.toByteArray().toList() }
+    val data = map { it.toByteArray().toList() }
         .toList()
 
     val indices = data.indices
-    var count = 0
+    var count = 0L
     val expectedValues = listOf(sam, mas)
     indices.windowed(3).forEach { row ->
         indices.windowed(3).forEach { col ->

@@ -1,41 +1,24 @@
 package y2024.day02
 
-import utils.FileData
-import utils.expectResult
+import utils.executeDay
 import kotlin.math.abs
 import kotlin.math.sign
 
-private val fileData = FileData(day = 2, year = 2024)
-
 fun main() {
-    expectResult(2) {
-        part1(fileData.readTestData(1))
-    }
-    expectResult(4) {
-        part2(fileData.readTestData(2))
-    }
-
-    val data = fileData.readData()
-
-    val part1 = part1(data)
-    println("#1 -> $part1")
-    require(part1 == 165)
-    val part2 = part2(data)
-    println("#2 -> $part2")
-    require(part2 == 660)
+    executeDay(List<String>::part1, List<String>::part2)
 }
 
-private fun part1(lines: List<String>): Int = lines
-    .map(String::toLevels)
+private fun List<String>.part1(): Long = map(String::toLevels)
     .count(List<Int>::isSafe)
+    .toLong()
 
-private fun part2(lines: List<String>): Int = lines
-    .map(String::toLevels)
+private fun List<String>.part2(): Long = map(String::toLevels)
     .count { levels ->
         levels.isSafe() || levels.indices
             .map { i -> levels.filterIndexed { index, _ -> index != i } }
             .any(List<Int>::isSafe)
     }
+    .toLong()
 
 private fun String.toLevels() = this
     .split(" ")

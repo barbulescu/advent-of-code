@@ -1,3 +1,5 @@
+package y2024.day05
+
 import utils.executeDay
 
 fun main() {

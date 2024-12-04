@@ -1,41 +1,31 @@
 package y2024.day01
 
-import utils.FileData
-import utils.expectResult
+import utils.executeDay
 import kotlin.math.abs
 
-private val fileData = FileData(day = 1, year = 2024)
-
 fun main() {
-    expectResult(11) {
-        part1(fileData.readTestData(1))
-    }
-    expectResult(31) {
-        part2(fileData.readTestData(2))
-    }
-
-    val data = fileData.readData()
-
-    println("#1 -> ${part1(data)}")
-    println("#2 -> ${part2(data)}")
+    executeDay(List<String>::part1, List<String>::part2)
 }
 
-private fun part1(lines: List<String>): Int {
-    val (left, right) = parseLists(lines)
+private fun List<String>.part1(): Long {
+    val (left, right) = parseLists(this)
     left.sort()
     right.sort()
 
     return left.indices
         .sumOf { abs(left[it] - right[it]) }
+        .toLong()
 }
 
-private fun part2(lines: List<String>): Int {
-    val (left, right) = parseLists(lines)
-    val rightCounts = right.groupingBy{ it }.eachCount()
-    return left.sumOf {
-        val count = rightCounts[it] ?: 0
-        it * count
-    }
+private fun List<String>.part2(): Long {
+    val (left, right) = parseLists(this)
+    val rightCounts = right.groupingBy { it }.eachCount()
+    return left
+        .sumOf {
+            val count = rightCounts[it] ?: 0
+            it * count
+        }
+        .toLong()
 }
 
 private fun parseLists(lines: List<String>): Pair<MutableList<Int>, MutableList<Int>> {

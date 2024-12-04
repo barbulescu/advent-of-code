@@ -1,29 +1,15 @@
 package y2024.day03
 
-import utils.FileData
-import utils.expectLongResult
-
-private val fileData = FileData(day = 3, year = 2024)
+import utils.executeDay
 
 fun main() {
-    expectLongResult(161) {
-        part1(fileData.readTestData(1))
-    }
-    expectLongResult(48) {
-        part2(fileData.readTestData(2))
-    }
-
-    val data = fileData.readData()
-
-    println("#1 -> ${part1(data)}")
-    println("#2 -> ${part2(data)}")
+    executeDay(List<String>::part1, List<String>::part2)
 }
 
-private fun part1(lines: List<String>): Long = lines
-    .sumOf(String::processOperations)
+private fun List<String>.part1(): Long = sumOf(String::processOperations)
 
-private fun part2(lines: List<String>): Long {
-    val fullLine = lines.joinToString(separator = "")
+private fun List<String>.part2(): Long {
+    val fullLine = joinToString(separator = "")
     val parts = fullLine.split("don't()")
     val sequence = sequenceOf(parts[0]) + parts.asSequence()
         .drop(1)
