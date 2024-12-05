@@ -38,25 +38,25 @@ fun executeDay(part1Block: List<String>.() -> Long, part2Block: List<String>.() 
     require(results.size == 4) { "expect 4 results: $results" }
 
     expectLongResult(results[0]) {
-        val lines = fileData.readTestData(1)
-        part1Block(lines)
-    }
-
-    expectLongResult(results[1]) {
-        val lines = fileData.readTestData(2)
-        part2Block(lines)
+        part1Block(fileData.readTestData(1))
     }
 
     val lines = fileData.readData()
 
     val part1 = part1Block(lines)
-    require(part1 == results[2]) {
-        "expected ${results[2]} but got $part1 for first part"
+    val expected1 = results[1]
+    require(part1 == expected1) {
+        "expected $expected1 but got $part1 for first part"
+    }
+
+    expectLongResult(results[2]) {
+        part2Block(fileData.readTestData(2))
     }
 
     val part2 = part2Block(lines)
-    require(part2 == results[3]) {
-        "expected ${results[3]} but got $part2 for second part"
+    val expected2 = results[3]
+    require(part2 == expected2) {
+        "expected $expected2 but got $part2 for second part"
     }
 
 }
