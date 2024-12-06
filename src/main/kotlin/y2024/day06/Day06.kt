@@ -28,48 +28,71 @@ data class Guard(val x: Int, val y: Int, val orientation: Orientation) {
     }
 }
 
+class Lab(private val data: MutableList<MutableList<Char>>) {
+    val initialPosition =  findGuard()
+    private val cols = data[0].size
+    private val rows = data.size
+
+    fun markVisited(guard: Guard) {
+        data[guard.y][guard.x] = 'X'
+    }
+
+    fun isBlocked(guard: Guard): Boolean = data[guard.y][guard.x] == '#'
+
+    fun isNotLeaving(guard: Guard): Boolean = when (guard.orientation) {
+        NORTH -> guard.y != 0
+        EAST -> guard.x != cols - 1
+        SOUTH -> guard.y != rows - 1
+        WEST -> guard.x != 0
+    }
+
+    fun visited() = data.flatten()
+        .count { it == 'X' }
+        .toLong()
+
+    private fun findGuard(): Guard {
+        data.forEachIndexed { y, line ->
+            line.forEachIndexed { x, c ->
+                if (c == '^') {
+                    return Guard(x, y, NORTH)
+                }
+            }
+        }
+        error("Unable to find guard")
+    }
+}
+
 fun main() {
     executeDay(List<String>::part1, List<String>::part2)
 }
 
 private fun List<String>.part1(): Long {
+    val lab: Lab = buildLab()
+    var guard = lab.initialPosition
+
+    lab.markVisited(guard)
+    while (lab.isNotLeaving(guard)) {
+        val nexPosition = guard.move()
+
+        guard = if (lab.isBlocked(nexPosition)) {
+            guard.rotate()
+        } else {
+            nexPosition
+        }
+        lab.markVisited(guard)
+    }
+
+    return lab.visited()
+}
+
+private fun List<String>.buildLab(): Lab {
     val map: MutableList<MutableList<Char>> = this.map { line ->
         line.chars()
             .asSequence()
             .map(Int::toChar)
             .toMutableList()
     }.toMutableList()
-
-    var guard = Guard(0, 0, NORTH)
-    this.forEachIndexed { y, line ->
-        line.forEachIndexed { x, c ->
-            if (c == '^') {
-                guard = Guard(x, y, NORTH)
-            }
-        }
-    }
-    map[guard.y][guard.x] = 'X'
-    while (isNotLeaving(map, guard)) {
-        val nexPosition = guard.move()
-
-        guard = if (map[nexPosition.y][nexPosition.x] == '#') {
-            guard.rotate()
-        } else {
-            nexPosition
-        }
-        map[guard.y][guard.x] = 'X'
-    }
-
-    return map.flatten()
-        .count { it == 'X' }
-        .toLong()
-}
-
-fun isNotLeaving(map: MutableList<MutableList<Char>>, guard: Guard): Boolean = when (guard.orientation) {
-    NORTH -> guard.y != 0
-    EAST -> guard.x != map[0].size - 1
-    SOUTH -> guard.y != map.size - 1
-    WEST -> guard.x != 0
+    return Lab(map)
 }
 
 private fun List<String>.part2(): Long {
