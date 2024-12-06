@@ -4,6 +4,7 @@ import utils.executeDay
 import y2024.day06.Orientation.*
 import java.util.*
 import kotlin.streams.asSequence
+import kotlin.streams.asStream
 
 enum class Orientation {
     NORTH,
@@ -29,7 +30,7 @@ data class Guard(val x: Int, val y: Int, val orientation: Orientation) {
 }
 
 class Lab(private val data: MutableList<MutableList<Char>>) {
-    val initialPosition =  findGuard()
+    val initialPosition = findGuard()
     private val cols = data[0].size
     private val rows = data.size
 
@@ -85,16 +86,56 @@ private fun List<String>.part1(): Long {
     return lab.visited()
 }
 
-private fun List<String>.buildLab(): Lab {
+private fun List<String>.buildLab(): Lab = Lab(buildLabMap())
+
+private fun List<String>.buildLabMap(): MutableList<MutableList<Char>> {
     val map: MutableList<MutableList<Char>> = this.map { line ->
         line.chars()
             .asSequence()
             .map(Int::toChar)
             .toMutableList()
     }.toMutableList()
-    return Lab(map)
+    return map
 }
 
-private fun List<String>.part2(): Long {
-    TODO("not implemented yet")
+private fun List<String>.part2(): Long = buildLabVariants()
+    .count { (lab, _) ->
+        var found = false
+        var guard = lab.initialPosition
+
+        lab.markVisited(guard)
+        var count = 0
+        while (lab.isNotLeaving(guard)) {
+            count++
+            if (count > 10000) {
+                found = true
+                break
+            }
+            val nexPosition = guard.move()
+
+            guard = if (lab.isBlocked(nexPosition)) {
+                guard.rotate()
+            } else {
+                nexPosition
+            }
+            if (guard == lab.initialPosition) {
+                found = true
+                break
+            }
+        }
+        found
+    }
+    .toLong()
+
+private fun List<String>.buildLabVariants(): Sequence<Pair<Lab, String>> = sequence {
+    forEachIndexed { y, line ->
+        line.forEachIndexed { x, c ->
+            if (c == '.') {
+                val raw = buildLabMap()
+                raw[y][x] = '#'
+                yield(Lab(raw) to "$y:$x")
+            }
+        }
+    }
 }
+
