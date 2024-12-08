@@ -5,9 +5,9 @@ fun main() {
 }
 
 private fun List<String>.part1(): Long {
-    return -1
+    TODO("part 1 is not yet implemented")
 }
 
 private fun List<String>.part2(): Long {
-    return -1
+    TODO("part 2 is not yet implemented")
 }
