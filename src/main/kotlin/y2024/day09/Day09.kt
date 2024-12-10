@@ -1,114 +1,99 @@
 package y2024.day09
 
 import utils.executeDay
-import utils.swap
 import java.util.*
 
 fun main() {
     executeDay(List<String>::part1, List<String>::part2)
 }
 
-private fun List<String>.part1(): Long {
-    val initialMap = StringBuilder(this[0].toMap())
+private fun List<String>.part1(): Long =
+    DiskPartitionTable(this[0]).process1().checksum()
 
-    for (l in initialMap.indices.reversed()) {
-        if (initialMap[l] != Char.MAX_VALUE) {
-            val i = initialMap.indexOf(Char.MAX_VALUE)
-            initialMap.swap(i, l)
-        }
-        val a = initialMap.indexOfLast { it != Char.MAX_VALUE } + 1
-        val b = initialMap.indexOf(Char.MAX_VALUE)
-        if (a == b) {
-            break
-        }
-    }
+private fun List<String>.part2(): Long =
+    DiskPartitionTable(this[0]).process2().checksum()
 
-    return initialMap.toChecksum()
+private data class Page(val id: Int, val used: Int, val free: Int) {
+    val size: Int = used + free
 }
 
-private fun StringBuilder.toChecksum() = filterNot { it == Char.MAX_VALUE }
-    .mapIndexed { index, c -> index.toLong() * c.code.toLong() }
-    .sum()
+private class DiskPartitionTable(val diskMap: String) {
+    val data: ArrayList<Page> = ArrayList<Page>(diskMap.length.let { it / 2 + it % 2 }).apply {
+        var id = 0
+        diskMap
+            .asSequence()
+            .map(Char::digitToInt)
+            .chunked(2) {
+                Page(id = id++, used = it[0], free = it.getOrElse(1) { 0 })
+            }
+            .forEach(::addLast)
+    }
+}
 
-private fun String.toMap(): String = toCharArray()
-    .flatMapIndexed { i, c ->
-        val lc = if (i % 2 == 0) {
-            (i / 2).toChar()
-        } else {
-            Char.MAX_VALUE
-        }
-        List(c.digitToInt()) { lc }
-    }.joinToString(separator = "")
+private fun DiskPartitionTable.checksum(): Long {
+    var sum = 0L
+    var block = 0
 
-private fun List<String>.part2(): Long {
-    val disk = this[0].toCharArray().mapIndexed { i, c ->
-        val id = i / 2
-        val type = if (i % 2 == 0) {
-            Type.DATA
-        } else {
-            Type.FREE
+    data.forEach { page ->
+        repeat(page.used) {
+            sum += page.id * block++
         }
-        Block(id, type, c.digitToInt())
-    }.toMutableList()
-
-    var dataIndex = disk.size
-    while (dataIndex > 0) {
-        dataIndex--
-
-        val data = disk[dataIndex]
-
-        if (data.type == Type.FREE) {
-            continue
-        }
-        if (data.size == 0) {
-            continue
-        }
-        val freeIndex = disk.indexOfFirst { it.type == Type.FREE && it.size >= data.size }
-        if (freeIndex < 0 || freeIndex >= dataIndex) {
-            continue
-        }
-
-        val free = disk[freeIndex]
-        if (free.size == data.size) {
-            disk.swap(dataIndex, freeIndex)
-            continue
-        }
-        val freeBlock1 = free.copy(size = data.size)
-        val freeBlock2 = free.copy(size = free.size - data.size)
-        disk[freeIndex] = data
-        disk[dataIndex] = freeBlock1
-        disk.add(freeIndex + 1, freeBlock2)
+        block += page.free
     }
 
-    var index = 0
-    return disk.sumOf {
-        val response = it.calculate(index)
-        index += it.size
-        response
+    return sum
+}
+
+private fun DiskPartitionTable.process1(): DiskPartitionTable {
+    var fullUntil = 0
+    while (true) {
+        val freeSpace = makeSpaceOrNull(start = fullUntil) ?: return this
+        fragmentLast()
+        move(data.lastIndex, freeSpace)
+        fullUntil = freeSpace
     }
+}
+
+private fun DiskPartitionTable.process2(): DiskPartitionTable {
+    val processed = mutableSetOf<Int>()
+    var index = data.size
+    while (index > 1) {
+        index--
+        val page = data[index]
+        if (page.id in processed) continue
+        processed.add(page.id)
+
+        val freeSpace = makeSpaceOrNull(minFree = page.used, end = index) ?: continue
+        move(index, freeSpace)
+        index++
+    }
+    return this
+}
+
+private fun DiskPartitionTable.makeSpaceOrNull(minFree: Int = 1, start: Int = 0, end: Int = data.lastIndex): Int? = data
+    .subList(start, end)
+    .indexOfFirst { it.free >= minFree }
+    .takeIf { it != -1 }
+    ?.let { start + it }
+
+private fun DiskPartitionTable.fragmentLast() {
+    if (data.last().used <= 1) {
+        return
+    }
+    val page = data.removeLast()
+    data.addLast(page.copy(used = page.used - 1, free = 0))
+    data.addLast(page.copy(used = 1, free = page.free))
+}
+
+private fun DiskPartitionTable.move(source: Int, destination: Int) {
+    val page = data.removeAt(source)
+
+    val previous = data.removeAt(source - 1)
+    data.add(source - 1, previous.copy(free = previous.free + page.size))
+
+    val insertedPage = data.removeAt(destination)
+    data.add(destination, insertedPage.copy(free = 0))
+    data.add(destination + 1, Page(page.id, page.used, insertedPage.free - page.used))
 
 }
 
-private data class Block(val id: Int, val type: Type, val size: Int) {
-    fun calculate(startIndex: Int): Long = if (type == Type.FREE) {
-        0
-    } else {
-        (0..<size)
-            .map { it + startIndex }
-            .sumOf { id * it }
-            .toLong()
-    }
-
-    override fun toString(): String =
-        String(
-            if (type == Type.FREE) {
-                List(size) { '.' }
-            } else {
-                List(size) { id.toChar() }
-            }.toCharArray())
-}
-
-private enum class Type {
-    DATA,
-    FREE
-}
