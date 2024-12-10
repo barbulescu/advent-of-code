@@ -106,7 +106,7 @@ private fun aa(
     }
 }
 
-fun <T> List<String>.toGrid(transform: (Char) -> T): Map<Point, T> = mutableMapOf<Point, T>().also {
+private fun <T> List<String>.toGrid(transform: (Char) -> T): Map<Point, T> = mutableMapOf<Point, T>().also {
     forEachIndexed { y, row ->
         row.forEachIndexed { x, char ->
             it[Point(x, y)] = transform(char)
