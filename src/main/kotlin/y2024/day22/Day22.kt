@@ -1,4 +1,4 @@
-package y2024.day10
+package y2024.day22
 
 import utils.executeDay
 
