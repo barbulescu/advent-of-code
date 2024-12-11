@@ -46,7 +46,7 @@ fun executeDay(part1Block: List<String>.() -> Long, part2Block: List<String>.() 
     val part1 = part1Block(lines)
     val expected1 = results[1]
     require(part1 == expected1) {
-        "expected $expected1 but got $part1 for first part"
+        "expected $expected1 but got $part1 for first part 1"
     }
 
     expectLongResult(results[2]) {
@@ -56,7 +56,7 @@ fun executeDay(part1Block: List<String>.() -> Long, part2Block: List<String>.() 
     val part2 = part2Block(lines)
     val expected2 = results[3]
     require(part2 == expected2) {
-        "expected $expected2 but got $part2 for second part"
+        "expected $expected2 but got $part2 for second part 2"
     }
 
 }

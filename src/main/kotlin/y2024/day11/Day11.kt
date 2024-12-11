@@ -1,50 +1,53 @@
 package y2024.day11
 
 import utils.executeDay
-import kotlin.math.abs
-import kotlin.math.log10
+import java.util.concurrent.ConcurrentHashMap
 
 fun main() {
     executeDay(List<String>::part1, List<String>::part2)
 }
 
-private fun List<String>.part1(): Long {
-    var stones = this[0].toNumbers()
-    repeat(25) { stones = stones.blink() }
-    return stones.size.toLong()
-}
+private fun List<String>.part1(): Long = Stones(25)
+    .blink(this[0])
 
-fun String.toNumbers() = this
-    .split(" ")
-    .map(String::toLong)
-    .toList()
+private fun List<String>.part2(): Long = Stones(75)
+    .blink(this[0])
 
-fun List<Long>.blink(): List<Long> = this.asSequence()
-    .flatMap(Long::blink)
-    .toList()
+private class Stones(val maxDepth: Int) {
+    private val cache = ConcurrentHashMap<Pair<Int, Long>, Long>()
 
-fun Long.blink(): Sequence<Long> =
-    when {
-        this == 0L -> sequenceOf(1)
-        this.countDigits() % 2 == 0L -> {
-            val string = this.toString()
-            val part1 = string.substring(0, string.length / 2).toLong()
-            val part2 = string.substring(string.length / 2, string.length).toLong()
-            sequenceOf(part1, part2)
+    fun blink(line: String) = line
+        .split(" ")
+        .asSequence()
+        .map(String::toLong)
+        .map { number -> number.blink(0) }
+        .sum()
+
+
+    private fun Long.blink(depth: Int): Long = cache.getOrPut(depth to this) {
+        calculateBlinks(depth)
+    }
+
+    private fun Long.calculateBlinks(depth: Int): Long {
+        if (depth == maxDepth) {
+            return 1
         }
-        else -> sequenceOf(this * 2024)
+        val nextDepth = depth + 1
+        if (this == 0L) {
+            return 1L.blink(nextDepth)
+        }
+
+        val stringValue = this.toString()
+        if (stringValue.length % 2 == 0) {
+            val part1 = stringValue.firstHalf().blink(nextDepth)
+            val part2 = stringValue.secondHalf().blink(nextDepth)
+            return part1 + part2
+        }
+
+        return (this * 2024).blink(nextDepth)
     }
 
-private fun Long.countDigits() = when (this) {
-    0L -> 1L
-    else -> log10(abs(toDouble())).toLong() + 1
-}
+    private fun String.secondHalf() = substring(length / 2, length).toLong()
+    private fun String.firstHalf() = substring(0, length / 2).toLong()
 
-private fun List<String>.part2(): Long {
-    var stones = this[0].toNumbers()
-    repeat(75) {
-        stones = stones.blink()
-        println(it)
-    }
-    return stones.size.toLong()
 }
