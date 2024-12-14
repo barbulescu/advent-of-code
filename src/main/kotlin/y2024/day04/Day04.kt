@@ -6,10 +6,10 @@ fun main() {
     executeDay(List<String>::part1, List<String>::part2)
 }
 
-const val x = 88.toByte()
-const val m = 77.toByte()
-const val a = 65.toByte()
-const val s = 83.toByte()
+private const val x = 88.toByte()
+private const val m = 77.toByte()
+private const val a = 65.toByte()
+private const val s = 83.toByte()
 
 private fun List<String>.part1(): Long {
     val xmas = listOf(x, m, a, s)
