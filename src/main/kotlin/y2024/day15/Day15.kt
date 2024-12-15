@@ -15,10 +15,10 @@ fun List<String>.part1(): Long {
         .map { it.dropLast(1) }
         .map { it.drop(1) }
         .map(String::toCharArray)
-        .map(CharArray::toList)
-        .toList()
+        .map(CharArray::toMutableList)
+        .toMutableList()
 
-    val warehouse = Warehouse(warehouseLines)
+    val warehouse = Warehouse1(warehouseLines)
 
     this
         .takeLastWhile(String::isNotBlank)
@@ -28,21 +28,45 @@ fun List<String>.part1(): Long {
     return warehouse.calculate()
 }
 
-private fun List<String>.part2(): Long {
-    TODO("part 2 is not yet implemented")
+fun List<String>.part2(): Long {
+    val warehouseLines = this
+        .dropLast(1)
+        .asSequence()
+        .drop(1)
+        .takeWhile(String::isNotBlank)
+        .map { it.dropLast(1) }
+        .map { it.drop(1) }
+        .map {
+            it.toCharArray()
+                .asSequence()
+                .flatMap { x ->
+                    when (x) {
+                        'O' -> sequenceOf('[', ']')
+                        '#' -> sequenceOf('#', '#')
+                        else -> sequenceOf(x)
+                    }
+                }
+                .toMutableList()
+        }
+        .toMutableList()
+
+    val warehouse = Warehouse1(warehouseLines)
+
+    this
+        .takeLastWhile(String::isNotBlank)
+        .flatMap(String::toList)
+        .forEach(warehouse::move)
+
+    return warehouse.calculate()
 }
 
-private class Warehouse(data: List<List<Char>>) {
+private class Warehouse1(private val data: MutableList<MutableList<Char>>) {
     private val width = data[0].size
     private val height = data.size
 
     private var robot = data
-        .findChars(searchChar = '@')
+        .findChars('@')
         .first()
-    private val boxes = data.findChars('O')
-        .toMutableSet()
-    private val walls = data.findChars('#')
-        .toSet()
 
     fun move(command: Char) {
         println(command)
@@ -61,6 +85,11 @@ private class Warehouse(data: List<List<Char>>) {
         }
     }
 
+    private fun value(point: Point) = data[point.y][point.x]
+    private fun value(point: Point, c: Char) {
+        data[point.y][point.x ] = c
+    }
+
     private fun move(item: Point, move: (Point) -> Point): Point? {
         val nextItem = move(item)
 
@@ -70,14 +99,16 @@ private class Warehouse(data: List<List<Char>>) {
         if (nextItem.y !in (0..<height)) {
             return null
         }
-        if (nextItem in walls) {
+        if (value(nextItem) == '#') {
             return null
         }
-        if (nextItem in boxes) {
+        if (value(nextItem) == 'O') {
             val newBox = move(nextItem, move)
             if (newBox != null) {
-                boxes.remove(nextItem)
-                boxes.add(newBox)
+                val x = value(newBox)
+                value(newBox, value(nextItem))
+                value(nextItem, x)
+
                 println("move Box from $nextItem to $newBox")
             } else {
                 return null
@@ -86,15 +117,18 @@ private class Warehouse(data: List<List<Char>>) {
         return nextItem
     }
 
-    fun calculate(): Long = boxes.sumOf { (it.x + 1) + (it.y + 1) * 100 }.toLong()
+    fun calculate(): Long = data
+        .findChars('O')
+        .sumOf { (it.x + 1) + (it.y + 1) * 100 }.toLong()
 }
+
 
 private data class Point(val x: Int, val y: Int)
 
-private fun List<List<Char>>.findChars(searchChar: Char) = asSequence()
+private fun List<List<Char>>.findChars(vararg searchChars: Char) = asSequence()
     .flatMapIndexed { y, chars ->
         chars.mapIndexed { x, c ->
-            if (c == searchChar) {
+            if (c in searchChars) {
                 Point(x, y)
             } else {
                 null
