@@ -6,6 +6,12 @@ fun main() {
     executeDay(List<String>::part1, List<String>::part2)
 }
 
+private const val BOX = 'O'
+private const val WALL = '#'
+private const val ROBOT = '@'
+private const val BOX_LEFT = '['
+private const val BOX_RIGHT = ']'
+
 fun List<String>.part1(): Long {
     val warehouseLines = this
         .dropLast(1)
@@ -28,6 +34,7 @@ fun List<String>.part1(): Long {
     return warehouse.calculate()
 }
 
+
 fun List<String>.part2(): Long {
     val warehouseLines = this
         .dropLast(1)
@@ -41,8 +48,8 @@ fun List<String>.part2(): Long {
                 .asSequence()
                 .flatMap { x ->
                     when (x) {
-                        'O' -> sequenceOf('[', ']')
-                        '#' -> sequenceOf('#', '#')
+                        BOX -> sequenceOf(BOX_LEFT, BOX_RIGHT)
+                        WALL -> sequenceOf(WALL, WALL)
                         else -> sequenceOf(x)
                     }
                 }
@@ -50,7 +57,7 @@ fun List<String>.part2(): Long {
         }
         .toMutableList()
 
-    val warehouse = Warehouse1(warehouseLines)
+    val warehouse = Warehouse2(warehouseLines)
 
     this
         .takeLastWhile(String::isNotBlank)
@@ -65,7 +72,67 @@ private class Warehouse1(private val data: MutableList<MutableList<Char>>) {
     private val height = data.size
 
     private var robot = data
-        .findChars('@')
+        .findChars(ROBOT)
+        .first()
+
+    fun move(command: Char) {
+        val newRobot = when (command) {
+            '^' -> move(robot) { it.copy(y = it.y - 1) }
+            '>' -> move(robot) { it.copy(x = it.x + 1) }
+            '<' -> move(robot) { it.copy(x = it.x - 1) }
+            'v' -> move(robot) { it.copy(y = it.y + 1) }
+            else -> error("Unsupported command: `$command`")
+        }
+        if (newRobot != null) {
+            robot = newRobot
+        }
+    }
+
+    private fun value(point: Point) = data[point.y][point.x]
+    private fun value(point: Point, c: Char) {
+        data[point.y][point.x] = c
+    }
+
+    private fun swap(p1: Point, p2: Point) {
+        val value = value(p1)
+        value(p1, value(p2))
+        value(p2, value)
+    }
+
+    private fun move(item: Point, move: (Point) -> Point): Point? {
+        val nextItem = move(item)
+
+        if (nextItem.x !in (0..<width)) {
+            return null
+        }
+        if (nextItem.y !in (0..<height)) {
+            return null
+        }
+        if (value(nextItem) == WALL) {
+            return null
+        }
+        if (value(nextItem) == BOX) {
+            val newBox = move(nextItem, move)
+            if (newBox != null) {
+                swap(nextItem, newBox)
+            } else {
+                return null
+            }
+        }
+        return nextItem
+    }
+
+    fun calculate(): Long = data
+        .findChars(BOX)
+        .sumOf { (it.x + 1) + (it.y + 1) * 100 }.toLong()
+}
+
+private class Warehouse2(private val data: MutableList<MutableList<Char>>) {
+    private val width = data[0].size
+    private val height = data.size
+
+    private var robot = data
+        .findChars(ROBOT)
         .first()
 
     fun move(command: Char) {
@@ -87,7 +154,13 @@ private class Warehouse1(private val data: MutableList<MutableList<Char>>) {
 
     private fun value(point: Point) = data[point.y][point.x]
     private fun value(point: Point, c: Char) {
-        data[point.y][point.x ] = c
+        data[point.y][point.x] = c
+    }
+
+    private fun swap(p1: Point, p2: Point) {
+        val value = value(p1)
+        value(p1, value(p2))
+        value(p2, value)
     }
 
     private fun move(item: Point, move: (Point) -> Point): Point? {
@@ -99,16 +172,13 @@ private class Warehouse1(private val data: MutableList<MutableList<Char>>) {
         if (nextItem.y !in (0..<height)) {
             return null
         }
-        if (value(nextItem) == '#') {
+        if (value(nextItem) == WALL) {
             return null
         }
-        if (value(nextItem) == 'O') {
+        if (value(nextItem) == BOX) {
             val newBox = move(nextItem, move)
             if (newBox != null) {
-                val x = value(newBox)
-                value(newBox, value(nextItem))
-                value(nextItem, x)
-
+                swap(nextItem, newBox)
                 println("move Box from $nextItem to $newBox")
             } else {
                 return null
@@ -118,7 +188,7 @@ private class Warehouse1(private val data: MutableList<MutableList<Char>>) {
     }
 
     fun calculate(): Long = data
-        .findChars('O')
+        .findChars(BOX)
         .sumOf { (it.x + 1) + (it.y + 1) * 100 }.toLong()
 }
 
