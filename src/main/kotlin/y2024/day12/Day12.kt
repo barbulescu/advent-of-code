@@ -6,73 +6,97 @@ fun main() {
     executeDay(List<String>::part1, List<String>::part2)
 }
 
-private fun List<String>.part1(): Long {
-    val grid = this.toGrid()
-    return grid
-        .plants()
-        .filterNot { it.visited }
-        .sumOf { rootPlant ->
-            val plants = grid
-                .processPlat(rootPlant)
-                .toList()
+fun List<String>.part1(): Long = this
+    .findRegions()
+    .sumOf { it.area * it.perimeter }
+    .toLong()
 
-            val perimeter = plants
-                .sumOf { plant ->
-                    grid.neighbours(plant)
-                        .count { it == null || it.type != plant.type }
-                }
+fun List<String>.part2(): Long = this
+    .findRegions()
+    .sumOf { it.area * it.sides }
+    .toLong()
 
-            plants.size * perimeter
+private fun List<String>.findRegions(): List<Region> {
+    val visited = mutableSetOf<Point2D>()
+    return flatMapIndexed { y, row ->
+        row.mapIndexedNotNull { x, _ ->
+            val point = Point2D(x, y)
+            if (point !in visited) {
+                findRegion(this, point, visited)
+            } else {
+                null
+            }
         }
-        .toLong()
-
-}
-
-private fun List<String>.part2(): Long {
-    TODO("part 2 is not yet implemented")
-}
-
-private fun List<String>.toGrid(): Grid {
-    val data = this.mapIndexed { y, line ->
-        line.mapIndexed { x, c -> Plant(x, y, PlantType(c)) }
     }
-    return Grid(data)
 }
 
-private class Grid(private val data: List<List<Plant>>) {
-    fun plants() = data.asSequence().flatten()
+private fun findRegion(grid: List<String>, start: Point2D, visited: MutableSet<Point2D>): Region {
+    val target: Char = grid[start] ?: error("Invalid start point: $start")
+    val queue = mutableListOf(start)
+    var area = 0
+    var perimeter = 0
+    var corners = 0
 
-    fun processPlat(plant: Plant = data[0][0]): Sequence<Plant> {
-        if (plant.visited) {
-            return emptySequence()
+    while (queue.isNotEmpty()) {
+        val place = queue.removeFirst()
+        if (grid[place] == target && place !in visited) {
+            visited += place
+            area++
+            val neighbors = place.cardinalNeighbors()
+            queue.addAll(neighbors)
+            perimeter += neighbors.count { grid[it] != target }
+            corners += place.countCorners(grid)
         }
-        plant.visited = true
+    }
+    return Region(target, area, perimeter, corners)
+}
 
-        return neighbours(plant)
-            .filterNotNull()
-            .filter { it.type == plant.type }
-            .flatMap { processPlat(it) } + plant
+private operator fun List<String>.contains(point: Point2D): Boolean =
+    point.y in indices && point.x in get(point.y).indices
+
+private operator fun List<String>.get(point: Point2D): Char? =
+    if (point in this) {
+        this[point.y][point.x]
+    } else {
+        null
     }
 
-    fun neighbours(plant: Plant) = sequenceOf(
-        pointAt(plant.x - 1, plant.y),
-        pointAt(plant.x, plant.y - 1),
-        pointAt(plant.x, plant.y + 1),
-        pointAt(plant.x + 1, plant.y),
+private fun Point2D.countCorners(grid: List<String>): Int =
+    listOf(NORTH, EAST, SOUTH, WEST, NORTH)
+        .zipWithNext()
+        .map { (first, second) ->
+            listOf(
+                grid[this],
+                grid[this + first],
+                grid[this + second],
+                grid[this + first + second]
+            )
+        }
+        .count { (target, side1, side2, corner) ->
+            (target != side1 && target != side2) || (side1 == target && side2 == target && corner != target)
+        }
+
+private data class Region(val name: Char, val area: Int, val perimeter: Int, val sides: Int)
+
+data class Point2D(val x: Int, val y: Int) {
+    fun cardinalNeighbors(): Set<Point2D> = setOf(
+        this + NORTH,
+        this + EAST,
+        this + SOUTH,
+        this + WEST
     )
 
-    private fun pointAt(x: Int, y: Int): Plant? {
-        if (x < 0 || x >= data[0].size) {
-            return null
-        }
-        if (y < 0 || y >= data.size) {
-            return null
-        }
-        return data[y][x]
-    }
+    operator fun plus(other: Point2D): Point2D =
+        Point2D(x + other.x, y + other.y)
+
+    operator fun minus(other: Point2D): Point2D =
+        Point2D(x - other.x, y - other.y)
+
 }
 
-private data class Plant(val x: Int, val y: Int, val type: PlantType, var visited: Boolean = false)
+private val NORTH = Point2D(0, -1)
+private val EAST = Point2D(1, 0)
+private val SOUTH = Point2D(0, 1)
+private val WEST = Point2D(-1, 0)
 
-@JvmInline
-value class PlantType(val char: Char)
+
