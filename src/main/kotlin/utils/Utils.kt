@@ -1,16 +1,5 @@
 package utils
 
-import java.math.BigInteger
-import java.security.MessageDigest
-
-/**
- * Converts string to md5 hash.
- */
-fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray()))
-    .toString(16)
-    .padStart(32, '0')
-
-
 fun expectResult(expected: Int, processor: () -> Int) {
     val actual = processor()
     if (actual != expected) {
@@ -27,7 +16,7 @@ fun expectLongResult(expected: Long, processor: () -> Long) {
 
 fun executeDay(part1Block: List<String>.() -> Long, part2Block: List<String>.() -> Long) {
     val fileData = fileData()
-    val results = fileData.results()
+    val results = fileData.resultsAsLong()
     require(results.size == 4) { "expect 4 results: $results" }
 
     println("part 1 - test")
@@ -74,6 +63,7 @@ private fun fileData(): FileData {
     return fileData
 }
 
-fun String.toLines() = this.lines()
-    .filterNot(String::isBlank)
+fun String.toLines() = this
+    .trimIndent()
+    .lines()
     .map(String::trim)

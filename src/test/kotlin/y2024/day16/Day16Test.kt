@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import utils.toLines
 import utils.withFileData
 
-class Day16KtTest {
+class Day16Test {
     private val example1 = """
         ###############
         #.......#....E#
@@ -62,7 +62,7 @@ class Day16KtTest {
     fun `part 1 with data`() {
         withFileData {
             Day16(readData()).part1().also {
-                assertThat(it).isEqualTo(results()[0])
+                assertThat(it).isEqualTo(resultsAsLong()[0])
             }
         }
     }
@@ -85,7 +85,7 @@ class Day16KtTest {
     fun `part 2 with data`() {
         withFileData {
             Day16(readData()).part2().also {
-                assertThat(it).isEqualTo(results()[1])
+                assertThat(it).isEqualTo(resultsAsLong()[1])
             }
         }
     }
