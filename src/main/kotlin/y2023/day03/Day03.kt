@@ -40,8 +40,8 @@ private fun Grid<Char>.asNumbers() = this
     .windowed(2)
     .filter { it[0].second.isDigit() }
     .fold(mutableListOf(Number(this))) { numbers, window ->
-        val p1: Point = window[0].first
-        val p2: Point? = window.getOrNull(1)?.first
+        val p1: Point2D = window[0].first
+        val p2: Point2D? = window.getOrNull(1)?.first
         val p2Char: Char = window.getOrNull(1)?.second!!
         numbers.last().addPoint(p1)
         if (p2 == null || !p2Char.isDigit() || p2.isFirstColumn()) {
@@ -54,8 +54,8 @@ private fun Grid<Char>.asNumbers() = this
 
 private data class Gear(val x: Int, val y: Int)
 
-private data class Number(private val grid: Grid<Char>, private val data: MutableList<Point> = mutableListOf()) {
-    fun addPoint(point: Point) {
+private data class Number(private val grid: Grid<Char>, private val data: MutableList<Point2D> = mutableListOf()) {
+    fun addPoint(point: Point2D) {
         data.add(point)
     }
 
@@ -68,7 +68,7 @@ private data class Number(private val grid: Grid<Char>, private val data: Mutabl
 
     fun hasAdjacentSymbol() = data.any { it.hasAdjacentSymbol() }
 
-    private fun Point.hasAdjacentSymbol(): Boolean =
+    private fun Point2D.hasAdjacentSymbol(): Boolean =
         grid.neighbours(x, y)
             .map { grid.getValue(it) }
             .filterNot { it == '.' }
@@ -80,7 +80,7 @@ private data class Number(private val grid: Grid<Char>, private val data: Mutabl
             .distinct()
             .map { it to toInt() }
 
-    private fun Point.findGears(): Sequence<Gear> =
+    private fun Point2D.findGears(): Sequence<Gear> =
         grid.neighbours(x, y)
             .filter { grid.getValue(it) == '*' }
             .map { Gear(it.x, it.y) }

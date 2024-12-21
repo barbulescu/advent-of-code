@@ -24,7 +24,7 @@ fun main() {
 }
 
 private fun part1(lines: List<String>): Int = lines.toArea()
-    .processStart(Beam(Point(-1, 0), EAST))
+    .processStart(Beam(Point2D(-1, 0), EAST))
 
 private fun part2(lines: List<String>): Int = runBlocking {
     val grid = lines.toArea()
@@ -34,7 +34,7 @@ private fun part2(lines: List<String>): Int = runBlocking {
         .max()
 }
 
-private fun Map<Point, Char>.processStart(start: Beam): Int {
+private fun Map<Point2D, Char>.processStart(start: Beam): Int {
     val beams = mutableListOf(start)
     val beamsHistory = mutableSetOf<Beam>()
     while (beams.isNotEmpty()) {
@@ -43,21 +43,21 @@ private fun Map<Point, Char>.processStart(start: Beam): Int {
     return beamsHistory.map(Beam::position).distinct().count()
 }
 
-private fun buildStartBeams(grid: Map<Point, Char>): MutableList<Beam> {
-    val maxX = grid.keys.maxOf(Point::x)
-    val maxY = grid.keys.maxOf(Point::y)
+private fun buildStartBeams(grid: Map<Point2D, Char>): MutableList<Beam> {
+    val maxX = grid.keys.maxOf(Point2D::x)
+    val maxY = grid.keys.maxOf(Point2D::y)
 
     val starts = mutableListOf<Beam>()
     for (x in 0..maxX) {
-        starts += listOf(Beam(Point(x, -1), SOUTH), Beam(Point(x, maxY + 1), NORTH))
+        starts += listOf(Beam(Point2D(x, -1), SOUTH), Beam(Point2D(x, maxY + 1), NORTH))
     }
     for (y in 0..maxY) {
-        starts += listOf(Beam(Point(-1, y), EAST), Beam(Point(maxX + 1, y), WEST))
+        starts += listOf(Beam(Point2D(-1, y), EAST), Beam(Point2D(maxX + 1, y), WEST))
     }
     return starts
 }
 
-private fun Map<Point, Char>.move(beams: MutableList<Beam>, beamsHistory: MutableSet<Beam>) {
+private fun Map<Point2D, Char>.move(beams: MutableList<Beam>, beamsHistory: MutableSet<Beam>) {
     val beam = beams.removeFirst()
     val next = beam.position.move(beam.direction)
     if (next !in this || beam.copy(position = next) in beamsHistory) {
@@ -68,10 +68,10 @@ private fun Map<Point, Char>.move(beams: MutableList<Beam>, beamsHistory: Mutabl
     beams += nextBeam(next, beam)
 }
 
-private fun Map<Point, Char>.nextBeam(next: Point, beam: Beam) = nextDirection(next, beam)
+private fun Map<Point2D, Char>.nextBeam(next: Point2D, beam: Beam) = nextDirection(next, beam)
     .map { Beam(next, it) }
 
-private fun Map<Point, Char>.nextDirection(next: Point, beam: Beam) = when (this[next]) {
+private fun Map<Point2D, Char>.nextDirection(next: Point2D, beam: Beam) = when (this[next]) {
     '.' -> beam.directions
     '/' -> DIRECTIONS_1.getValue(beam.direction)
     '\\' -> DIRECTIONS_2.getValue(beam.direction)
@@ -80,7 +80,7 @@ private fun Map<Point, Char>.nextDirection(next: Point, beam: Beam) = when (this
     else -> error("Invalid point: ${this[next]}")
 }
 
-data class Beam(val position: Point, val direction: Direction) {
+data class Beam(val position: Point2D, val direction: Direction) {
     val directions = listOf(direction)
     val map3 = mapOf(
         NORTH to WEST_EAST,

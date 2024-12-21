@@ -1,7 +1,7 @@
 package y2023.day11
 
 import utils.FileData
-import utils.Point
+import utils.Point2D
 import utils.expectLongResult
 import kotlin.math.abs
 import kotlin.math.max
@@ -45,24 +45,24 @@ class Galaxies(lines: List<String>, private val factor: Long) {
 
 }
 
-private data class Points(val from: Point, val to: Point) {
+private data class Points(val from: Point2D, val to: Point2D) {
     fun rangeX() = min(from.x, to.x)..max(from.x, to.x)
     fun rangeY() = min(from.y, to.y)..max(from.y, to.y)
     fun manhattanDistance() = abs(from.x - to.x) + abs(from.y - to.y)
 }
 
-private fun List<String>.expandY(galaxies: MutableList<Point>) = indices
+private fun List<String>.expandY(galaxies: MutableList<Point2D>) = indices
     .filter { y -> this[0].indices.none { x -> galaxies.contains(x, y) } }
 
-private fun List<String>.expandX(galaxies: MutableList<Point>) = this[0].indices
+private fun List<String>.expandX(galaxies: MutableList<Point2D>) = this[0].indices
     .filter { x -> indices.none { y -> galaxies.contains(x, y) } }
 
-private fun buildGalaxies(lines: List<String>): MutableList<Point> = lines
+private fun buildGalaxies(lines: List<String>): MutableList<Point2D> = lines
     .flatMapIndexed { y, line -> line.buildGalaxyRow(y) }
     .toMutableList()
 
 private fun String.buildGalaxyRow(y: Int) = this
-    .mapIndexed { x, c -> if (c == '#') Point(x, y) else null }
+    .mapIndexed { x, c -> if (c == '#') Point2D(x, y) else null }
     .filterNotNull()
 
-private fun MutableList<Point>.contains(x: Int, y: Int) = Point(x, y) in this
+private fun MutableList<Point2D>.contains(x: Int, y: Int) = Point2D(x, y) in this

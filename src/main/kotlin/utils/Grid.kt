@@ -1,45 +1,5 @@
 package utils
 
-import utils.Direction.*
-
-enum class Direction {
-    NORTH, EAST, SOUTH, WEST;
-
-    fun reverse() = when (this) {
-        NORTH -> SOUTH
-        SOUTH -> NORTH
-        WEST -> EAST
-        EAST -> WEST
-    }
-}
-
-data class Point(val x: Int, val y: Int) {
-    fun isFirstColumn() = this.y == 0
-
-        companion object {
-        val ORIGIN = Point(0, 0)
-    }
-
-    fun move(direction: Direction, distance: Int = 1) = when (direction) {
-        EAST -> Point(x + distance, y)
-        WEST -> Point(x - distance, y)
-        NORTH -> Point(x, y - distance)
-        SOUTH -> Point(x, y + distance)
-    }
-
-
-    fun getAdjacentSides(): List<Point> = listOf(
-        Point(x, y - 1), Point(x - 1, y), Point(x + 1, y), Point(x, y + 1),
-    )
-
-    fun getAdjacent(): List<Point> = listOf(
-        Point(x - 1, y - 1), Point(x, y - 1), Point(x + 1, y - 1),
-        Point(x - 1, y), Point(x + 1, y),
-        Point(x - 1, y + 1), Point(x, y + 1), Point(x + 1, y + 1),
-    )
-
-}
-
 class Grid<T>(private val data: List<List<T>>) {
     fun asPoints() = data
         .asSequence()
@@ -57,17 +17,17 @@ class Grid<T>(private val data: List<List<T>>) {
     )
         .filterNotNull()
 
-    private fun pointAt(x: Int, y: Int): Point? {
+    private fun pointAt(x: Int, y: Int): Point2D? {
         if (x < 0 || x >= data.size) {
             return null
         }
         if (y < 0 || y >= data[0].size) {
             return null
         }
-        return Point(x, y)
+        return Point2D(x, y)
     }
 
-    fun getValue(point: Point) : T = data[point.x][point.y]
+    fun getValue(point: Point2D): T = data[point.x][point.y]
 }
 
 fun <T> List<String>.toGrid(mapper: (Char) -> T) = Grid(
@@ -76,14 +36,29 @@ fun <T> List<String>.toGrid(mapper: (Char) -> T) = Grid(
         .map { it.map(mapper).toList() }
 )
 
-fun <T> List<T>.toPoints(x: Int) = List(this.size) { y -> Point(x, y) }
+fun <T> List<T>.toPoints(x: Int) = List(this.size) { y -> Point2D(x, y) }
 
-fun List<String>.toArea(): Map<Point, Char> {
-    return mutableMapOf<Point, Char>().also {
+fun List<String>.toArea(): Map<Point2D, Char> {
+    return mutableMapOf<Point2D, Char>().also {
         forEachIndexed { y, row ->
             row.forEachIndexed { x, char ->
-                it[Point(x, y)] = char
+                it[Point2D(x, y)] = char
             }
         }
     }
 }
+
+fun List<CharArray>.hasValueAt(point: Point2D, value: Char) = this[point.y][point.x] == value
+
+fun List<CharArray>.findValue(value: Char): Point2D =
+    flatMapIndexed { y, line ->
+        line.mapIndexed { x, c ->
+            if (c == value) {
+                Point2D(x, y)
+            } else {
+                null
+            }
+        }
+    }
+        .filterNotNull()
+        .single()

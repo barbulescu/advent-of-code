@@ -3,7 +3,7 @@ package y2023.day10
 import utils.Direction
 import utils.Direction.*
 import utils.FileData
-import utils.Point
+import utils.Point2D
 import utils.expectResult
 
 private val fileData = FileData(day = 10, year = 2023)
@@ -31,21 +31,21 @@ private fun part2(lines: List<String>): Int = lines
     .buildGrid()
     .findEnclosedTiles()
 
-private data class DirectionPoint(val direction: Direction, val point: Point)
+private data class DirectionPoint(val direction: Direction, val point: Point2D)
 
-private data class PointDistance(val point: Point, val distance: Int)
+private data class PointDistance(val point: Point2D, val distance: Int)
 
-private fun Map<Point, Char>.directionsFrom(point: Point) =
+private fun Map<Point2D, Char>.directionsFrom(point: Point2D) =
     pipes.getOrDefault(getValue(point), emptyList())
 
-private operator fun <T> Map<Point, T>.contains(dp: DirectionPoint) = this.keys.contains(dp.point)
+private operator fun <T> Map<Point2D, T>.contains(dp: DirectionPoint) = this.keys.contains(dp.point)
 
-private fun Map<Point, Char>.findMaxLengthPath(): Int {
+private fun Map<Point2D, Char>.findMaxLengthPath(): Int {
     val startPoint = findStartPoint()
     return calculateExploredPathsWithDistances(startPoint).values.max()
 }
 
-private fun Map<Point, Char>.calculateExploredPathsWithDistances(startPoint: Point): MutableMap<Point, Int> {
+private fun Map<Point2D, Char>.calculateExploredPathsWithDistances(startPoint: Point2D): MutableMap<Point2D, Int> {
     val unexplored = mutableListOf(PointDistance(startPoint, 0))
     val explored = mutableMapOf(startPoint to 0)
 
@@ -65,11 +65,11 @@ private fun Map<Point, Char>.calculateExploredPathsWithDistances(startPoint: Poi
     return explored
 }
 
-private fun Map<Point, Char>.findEnclosedTiles(): Int {
+private fun Map<Point2D, Char>.findEnclosedTiles(): Int {
     val startPoint = findStartPoint()
-    val explored: MutableSet<Point> = calculateExploredPaths(startPoint)
+    val explored: MutableSet<Point2D> = calculateExploredPaths(startPoint)
 
-    val expandedGrid = mutableMapOf<Point, Char>()
+    val expandedGrid = mutableMapOf<Point2D, Char>()
     forEach { (point, char) ->
         val expandedPoint = point.triple()
         expandedGrid[expandedPoint] = if (char != '.' && point in explored) '#' else '.'
@@ -82,7 +82,7 @@ private fun Map<Point, Char>.findEnclosedTiles(): Int {
         }
     }
 
-    val toFlood = mutableListOf(Point.ORIGIN)
+    val toFlood = mutableListOf(Point2D.ORIGIN)
     while (toFlood.isNotEmpty()) {
         val current = toFlood.removeFirst()
         expandedGrid[current] = '='
@@ -94,12 +94,12 @@ private fun Map<Point, Char>.findEnclosedTiles(): Int {
     return keys.count { expandedGrid[it.triple()] == '.' }
 }
 
-private fun Point.multiply(factor: Int) = Point(x * factor, y * factor)
-private fun Point.triple() = this.multiply(3)
+private fun Point2D.multiply(factor: Int) = Point2D(x * factor, y * factor)
+private fun Point2D.triple() = this.multiply(3)
 
-private fun Map<Point, Char>.calculateExploredPaths(startPoint: Point): MutableSet<Point> {
+private fun Map<Point2D, Char>.calculateExploredPaths(startPoint: Point2D): MutableSet<Point2D> {
     val unexplored = mutableListOf(startPoint)
-    val explored = mutableSetOf<Point>()
+    val explored = mutableSetOf<Point2D>()
     while (unexplored.isNotEmpty()) {
         val currentPoint = unexplored.removeFirst()
         explored += currentPoint
@@ -115,13 +115,13 @@ private fun Map<Point, Char>.calculateExploredPaths(startPoint: Point): MutableS
     return explored
 }
 
-private fun Map<Point, Char>.findStartPoint() = this.entries.first { it.value == 'S' }.key
+private fun Map<Point2D, Char>.findStartPoint() = this.entries.first { it.value == 'S' }.key
 
-private fun List<String>.buildGrid(): Map<Point, Char> {
-    val grid = mutableMapOf<Point, Char>()
+private fun List<String>.buildGrid(): Map<Point2D, Char> {
+    val grid = mutableMapOf<Point2D, Char>()
     this.forEachIndexed { y, row ->
         row.forEachIndexed { x, c ->
-            grid[Point(x, y)] = c
+            grid[Point2D(x, y)] = c
         }
     }
     return grid.toMap()

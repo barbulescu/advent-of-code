@@ -3,7 +3,7 @@ package y2023.day17
 import utils.Direction
 import utils.Direction.*
 import utils.FileData
-import utils.Point
+import utils.Point2D
 import utils.expectResult
 
 private val fileData = FileData(day = 17, year = 2023)
@@ -23,14 +23,14 @@ fun main() {
     println("#2 -> ${part2(data)}")
 }
 
-data class State(val point: Point, val from: Direction, val line: Int)
+data class State(val point: Point2D, val from: Direction, val line: Int)
 data class StateLoss(val state: State, val loss: Int)
 
 class ProcessingContext(lines: List<String>) {
     val grid = lines.toGrid(Char::digitToInt)
-    private val target = Point(grid.keys.maxOf(Point::x), grid.keys.maxOf(Point::y))
+    private val target = Point2D(grid.keys.maxOf(Point2D::x), grid.keys.maxOf(Point2D::y))
 
-    private val initialState = State(Point(0, 0), EAST, 0)
+    private val initialState = State(Point2D(0, 0), EAST, 0)
     val unvisited = mutableListOf(StateLoss(initialState, 0))
     val visited = mutableMapOf<State, Int>()
 
@@ -90,7 +90,7 @@ private fun aa(
     direction: Direction,
     current: State,
     currentLoss: Int,
-    neighbor: Point,
+    neighbor: Point2D,
 ) {
     val line = if (direction == current.from) current.line + 1 else 1
     val newLoss = currentLoss + pc.grid.getValue(neighbor)
@@ -106,10 +106,10 @@ private fun aa(
     }
 }
 
-private fun <T> List<String>.toGrid(transform: (Char) -> T): Map<Point, T> = mutableMapOf<Point, T>().also {
+private fun <T> List<String>.toGrid(transform: (Char) -> T): Map<Point2D, T> = mutableMapOf<Point2D, T>().also {
     forEachIndexed { y, row ->
         row.forEachIndexed { x, char ->
-            it[Point(x, y)] = transform(char)
+            it[Point2D(x, y)] = transform(char)
         }
     }
 }

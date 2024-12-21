@@ -1,5 +1,6 @@
 package y2024.day12
 
+import utils.Point2D
 import utils.executeDay
 
 fun main() {
@@ -62,7 +63,7 @@ private operator fun List<String>.get(point: Point2D): Char? =
     }
 
 private fun Point2D.countCorners(grid: List<String>): Int =
-    listOf(NORTH, EAST, SOUTH, WEST, NORTH)
+    listOf(Point2D.NORTH, Point2D.EAST, Point2D.SOUTH, Point2D.WEST, Point2D.NORTH)
         .zipWithNext()
         .map { (first, second) ->
             listOf(
@@ -77,26 +78,3 @@ private fun Point2D.countCorners(grid: List<String>): Int =
         }
 
 private data class Region(val name: Char, val area: Int, val perimeter: Int, val sides: Int)
-
-data class Point2D(val x: Int, val y: Int) {
-    fun cardinalNeighbors(): Set<Point2D> = setOf(
-        this + NORTH,
-        this + EAST,
-        this + SOUTH,
-        this + WEST
-    )
-
-    operator fun plus(other: Point2D): Point2D =
-        Point2D(x + other.x, y + other.y)
-
-    operator fun minus(other: Point2D): Point2D =
-        Point2D(x - other.x, y - other.y)
-
-}
-
-private val NORTH = Point2D(0, -1)
-private val EAST = Point2D(1, 0)
-private val SOUTH = Point2D(0, 1)
-private val WEST = Point2D(-1, 0)
-
-
