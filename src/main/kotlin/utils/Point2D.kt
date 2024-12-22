@@ -54,14 +54,13 @@ data class Point2D(val x: Int, val y: Int) {
         this + WEST
     )
 
-    operator fun plus(other: Point2D): Point2D =
-        Point2D(x + other.x, y + other.y)
+    operator fun plus(other: Point2D): Point2D = Point2D(x + other.x, y + other.y)
 
-    operator fun minus(other: Point2D): Point2D =
-        Point2D(x - other.x, y - other.y)
+    operator fun minus(other: Point2D): Point2D = Point2D(x - other.x, y - other.y)
 
-    infix fun distanceTo(other: Point2D) =
-        abs(x - other.x) + abs(y - other.y)
+    infix fun distanceTo(other: Point2D) = abs(x - other.x) + abs(y - other.y)
+
+    fun inRange(end: Point2D): Boolean = (x in (0..end.x)) && (y in (0..end.y))
 
     companion object {
         val ORIGIN = Point2D(0, 0)
@@ -70,5 +69,10 @@ data class Point2D(val x: Int, val y: Int) {
         val EAST = Point2D(1, 0)
         val SOUTH = Point2D(0, 1)
         val WEST = Point2D(-1, 0)
+
+        fun of(input: String): Point2D =
+            input.split(",").let {
+                Point2D(it.first().toInt(), it.last().toInt())
+            }
     }
 }
