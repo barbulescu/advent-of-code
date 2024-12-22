@@ -2,59 +2,22 @@ package y2024.day16
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import utils.toLines
 import utils.withFileData
 
 class Day16Test {
-    private val example1 = """
-        ###############
-        #.......#....E#
-        #.#.###.#.###.#
-        #.....#.#...#.#
-        #.###.#####.#.#
-        #.#.#.......#.#
-        #.#.#####.###.#
-        #...........#.#
-        ###.#.#####.#.#
-        #...#.....#.#.#
-        #.#.#.###.#.#.#
-        #.....#...#.#.#
-        #.###.#.#.#.#.#
-        #S..#.....#...#
-        ###############            
-    """.toLines()
-
-    private val example2 = """
-        #################
-        #...#...#...#..E#
-        #.#.#.#.#.#.#.#.#
-        #.#.#.#...#...#.#
-        #.#.#.#.###.#.#.#
-        #...#.#.#.....#.#
-        #.#.#.#.#.#####.#
-        #.#...#.#.#.....#
-        #.#.#####.#.###.#
-        #.#.#.......#...#
-        #.#.###.#####.###
-        #.#.#...#.....#.#
-        #.#.#.#####.###.#
-        #.#.#.........#.#
-        #.#.#.#########.#
-        #S#.............#
-        #################
-    """.toLines()
-
     @Test
     fun `part 1 example 1`() {
-        Day16(example1).part1().also {
-            assertThat(it).isEqualTo(7036)
+        withFileData {
+            val sut = Day16(readTestData(1))
+            assertThat(sut.part1()).isEqualTo(7036)
         }
     }
 
     @Test
     fun `part 1 example 2`() {
-        Day16(example2).part1().also {
-            assertThat(it).isEqualTo(11048)
+        withFileData {
+            val sut = Day16(readTestData(2))
+            assertThat(sut.part1()).isEqualTo(11048)
         }
     }
 
@@ -69,15 +32,17 @@ class Day16Test {
 
     @Test
     fun `part 2 example 1`() {
-        Day16(example1).part2().also {
-            assertThat(it).isEqualTo(45)
+        withFileData {
+            val sut = Day16(readTestData(1))
+            assertThat(sut.part2()).isEqualTo(45)
         }
     }
 
     @Test
     fun `part 2 example 2`() {
-        Day16(example2).part2().also {
-            assertThat(it).isEqualTo(64)
+        withFileData {
+            val sut = Day16(readTestData(2))
+            assertThat(sut.part2()).isEqualTo(64)
         }
     }
 
@@ -89,5 +54,4 @@ class Day16Test {
             }
         }
     }
-
 }

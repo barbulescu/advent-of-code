@@ -14,8 +14,12 @@ class FileData(day: Int, year: Int) {
     fun results() = Path("$path/results.txt")
             .readLines()
 
-    fun readTestData(part: Int) = Path("$path/test_data_${part}.txt")
-        .readLines()
+    fun readTestData(part: Int, index: Int? = null): List<String> {
+        val indexSection = index?.let { "_$it" } ?: ""
+        return Path("$path/test_data_${part}${indexSection}.txt")
+            .readText()
+            .toLines()
+    }
 
     fun readData() = Path("$path/data.txt")
         .readText()
