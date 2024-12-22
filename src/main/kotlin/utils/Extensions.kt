@@ -41,3 +41,5 @@ fun <T> List<T>.binarySearchIndexOfFirstOrNull(fn: (T) -> Boolean): Int? {
     }
     return firstResult
 }
+
+fun Long.lastDigit() = this % 10
