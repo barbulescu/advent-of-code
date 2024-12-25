@@ -1,15 +1,34 @@
 package y2024.day25
 
-import utils.executeDay
+class Day25(private val input: List<String>) {
+    fun part1(): Int {
+        val locks = parseInput("#####")
+        val keys = parseInput(".....")
 
-fun main() {
-    executeDay(List<String>::part1, List<String>::part2)
-}
+        return locks.sumOf { lock ->
+            keys.count { lock.hasNoOverlap(it) }
+        }
+    }
 
-private fun List<String>.part1(): Long {
-    TODO("part 1 is not yet implemented")
-}
+    private fun parseInput(firstLine: String): Set<List<Int>> = input
+        .chunked(8)
+        .filter { it.first() == firstLine }
+        .map { it.toDepths() }
+        .toSet()
 
-private fun List<String>.part2(): Long {
-    TODO("part 2 is not yet implemented")
+    private fun List<String>.toDepths(): List<Int> {
+        val data = this
+            .dropLastWhile { it.isBlank() }
+            .dropLast(1)
+            .drop(1)
+        return data[0]
+            .indices
+            .map { column -> data.count { it[column] == '#' } }
+    }
+
+    private fun List<Int>.hasNoOverlap(other: List<Int>): Boolean =
+        this
+            .mapIndexed { index, i -> i + other[index] }
+            .all { it <= 5 }
+
 }
