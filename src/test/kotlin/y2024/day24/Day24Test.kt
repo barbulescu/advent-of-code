@@ -26,7 +26,7 @@ class Day24Test {
     fun `part 2 example 1`() {
         withFileData {
             val sut = Day24(readTestData(2))
-            assertThat(sut.part2()).isEqualTo("aaa,aoc,bbb,ccc,eee,ooo,z24,z99")
+            assertThat(sut.part2()).isEqualTo("mjb,tgd,wpb,z02,z03,z05,z06,z07,z08,z10,z11")
         }
     }
 
